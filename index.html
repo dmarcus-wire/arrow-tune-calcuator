@@ -102,7 +102,8 @@
       margin-bottom: 2px;
     }
 
-    .field input {
+    .field input,
+    .field textarea {
       border-radius: 6px;
       border: 1px solid #1f2937;
       padding: 6px 8px;
@@ -112,7 +113,13 @@
       outline: none;
     }
 
-    .field input:focus {
+    .field textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .field input:focus,
+    .field textarea:focus {
       border-color: #3b82f6;
       box-shadow: 0 0 0 1px #1d4ed8;
     }
@@ -261,15 +268,57 @@
     <div class="grid">
       <!-- LEFT: INPUTS -->
       <div>
+        <!-- Arrow Info (new) -->
+        <div class="card">
+          <h2>Arrow Info</h2>
+          <div class="field">
+            <label
+              for="arrowName"
+              title="Optional name for this arrow setup, such as brand and model."
+            >
+              Arrow name
+            </label>
+            <input
+              id="arrowName"
+              type="text"
+              placeholder="e.g. Easton Axis 5mm 300 spine"
+            />
+          </div>
+          <div class="field">
+            <label
+              for="arrowSpine"
+              title="Arrow spine rating (stiffness), such as 250, 300, 340, 400."
+            >
+              Arrow spine (rating)
+            </label>
+            <input
+              id="arrowSpine"
+              type="number"
+              step="1"
+              placeholder="e.g. 300"
+            />
+          </div>
+        </div>
+
         <div class="card">
           <h2>Bow</h2>
           <div class="field-row">
             <div class="field">
-              <label for="bowDrawWeightLb">Draw weight (lb)</label>
+              <label
+                for="bowDrawWeightLb"
+                title="Bow draw weight in pounds at your full draw length."
+              >
+                Draw weight (lb)
+              </label>
               <input id="bowDrawWeightLb" type="number" value="70" step="0.1" />
             </div>
             <div class="field">
-              <label for="bowDrawLengthIn">Draw length (in)</label>
+              <label
+                for="bowDrawLengthIn"
+                title="Your bow's draw length setting in inches."
+              >
+                Draw length (in)
+              </label>
               <input id="bowDrawLengthIn" type="number" value="28" step="0.1" />
             </div>
           </div>
@@ -279,11 +328,21 @@
           <h2>Arrow Shaft</h2>
           <div class="field-row">
             <div class="field">
-              <label for="arrowLengthIn">Arrow length (in)</label>
+              <label
+                for="arrowLengthIn"
+                title="Finished arrow length from nock throat to end of shaft (no point), in inches."
+              >
+                Arrow length (in)
+              </label>
               <input id="arrowLengthIn" type="number" value="28.25" step="0.01" />
             </div>
             <div class="field">
-              <label for="bareShaftWeightGr">Bare shaft weight (gr)</label>
+              <label
+                for="bareShaftWeightGr"
+                title="Weight of the bare arrow shaft only, without any components, in grains."
+              >
+                Bare shaft weight (gr)
+              </label>
               <input id="bareShaftWeightGr" type="number" value="300" step="0.1" />
             </div>
           </div>
@@ -293,33 +352,63 @@
           <h2>Components</h2>
           <div class="field-row">
             <div class="field">
-              <label for="nockWeightGr">Nock weight (gr)</label>
+              <label
+                for="nockWeightGr"
+                title="Weight of the arrow nock in grains."
+              >
+                Nock weight (gr)
+              </label>
               <input id="nockWeightGr" type="number" value="10" step="0.1" />
             </div>
             <div class="field">
-              <label for="wrapWeightGr">Wrap weight (gr, optional)</label>
+              <label
+                for="wrapWeightGr"
+                title="Total weight of any arrow wrap in grains. Use 0 if you don't use wraps."
+              >
+                Wrap weight (gr, optional)
+              </label>
               <input id="wrapWeightGr" type="number" value="0" step="0.1" />
             </div>
           </div>
 
           <div class="field-row">
             <div class="field">
-              <label for="vaneCount">Vane count</label>
+              <label
+                for="vaneCount"
+                title="Number of vanes or fletchings on the arrow, usually 3 or 4."
+              >
+                Vane count
+              </label>
               <input id="vaneCount" type="number" value="3" step="1" />
             </div>
             <div class="field">
-              <label for="vaneWeightGr">Vane weight each (gr)</label>
+              <label
+                for="vaneWeightGr"
+                title="Weight in grains of a single vane or fletching."
+              >
+                Vane weight each (gr)
+              </label>
               <input id="vaneWeightGr" type="number" value="9" step="0.1" />
             </div>
           </div>
 
           <div class="field-row">
             <div class="field">
-              <label for="insertWeightGr">Insert / outsert (gr)</label>
+              <label
+                for="insertWeightGr"
+                title="Weight in grains of the insert, outsert, or half-out component."
+              >
+                Insert / outsert (gr)
+              </label>
               <input id="insertWeightGr" type="number" value="50" step="0.1" />
             </div>
             <div class="field">
-              <label for="pointWeightGr">Point weight (gr)</label>
+              <label
+                for="pointWeightGr"
+                title="Weight in grains of the point or broadhead."
+              >
+                Point weight (gr)
+              </label>
               <input id="pointWeightGr" type="number" value="150" step="0.1" />
             </div>
           </div>
@@ -328,7 +417,10 @@
         <div class="card">
           <h2>Balance Point</h2>
           <div class="field">
-            <label for="balancePointIn">
+            <label
+              for="balancePointIn"
+              title="Distance from the nock throat to the balance point of the finished arrow, in inches."
+            >
               Balance point from nock (in)
             </label>
             <input id="balancePointIn" type="number" value="18.5" step="0.01" />
@@ -343,7 +435,17 @@
       <div>
         <div class="card">
           <h2>Results</h2>
+
           <div class="results-row">
+            <span class="label">Arrow</span>
+            <span class="value" id="arrowNameDisplay">Unnamed arrow</span>
+          </div>
+          <div class="results-row">
+            <span class="label">Spine</span>
+            <span class="value" id="arrowSpineDisplay">–</span>
+          </div>
+
+          <div class="results-row" style="margin-top:4px;">
             <span class="label">Total arrow weight</span>
             <span class="value" id="totalArrowWeightGr">–</span>
           </div>
@@ -399,6 +501,23 @@
           </div>
         </div>
 
+        <!-- Notes card (new) -->
+        <div class="card">
+          <h2>Notes</h2>
+          <div class="field">
+            <label
+              for="userNotes"
+              title="Any notes about this arrow, bow, tuning, or hunt. Not saved permanently yet."
+            >
+              Notes for this arrow setup
+            </label>
+            <textarea id="userNotes" placeholder="Example: Broadhead tune at 30 yards, used on elk hunt, etc."></textarea>
+          </div>
+          <div class="note">
+            Notes stay in this browser tab only for now. Future versions may allow saving multiple arrows.
+          </div>
+        </div>
+
         <div class="note">
           Tip: On your phone, you can usually “Add to Home Screen” from the browser menu to use this like an app.
         </div>
@@ -414,10 +533,7 @@
     // -----------------------------
     // App metadata (easy to update)
     // -----------------------------
-    // Bump the version when you make a meaningful change to the app.
-    const APP_VERSION = "v0.1.0";
-    // You can set this manually when you update the file, or
-    // calculate it dynamically if you prefer.
+    const APP_VERSION = "v0.2.0";
     const BUILD_DATE = "2025-11-23";
 
     // -----------------------------
@@ -443,6 +559,19 @@
       return value.toFixed(digits);
     }
 
+    /**
+     * Update the displayed arrow name in the Results card.
+     * Defaults to "Unnamed arrow" if the field is blank.
+     */
+    function updateArrowNameDisplay() {
+      const nameInput = document.getElementById("arrowName");
+      const nameDisplay = document.getElementById("arrowNameDisplay");
+      if (!nameInput || !nameDisplay) return;
+
+      const value = nameInput.value.trim();
+      nameDisplay.textContent = value || "Unnamed arrow";
+    }
+
     // -----------------------------
     // Main calculation & UI update
     // -----------------------------
@@ -464,6 +593,7 @@
       const pointWeightGr = readNumber("pointWeightGr");
 
       const balancePointIn = readNumber("balancePointIn");
+      const arrowSpine = readNumber("arrowSpine");
 
       // 2. Component weights (in grains)
       const shaftWeightGr = bareShaftWeightGr;
@@ -501,57 +631,85 @@
       // Update numeric result fields
       // -----------------------------
 
-      document.getElementById("totalArrowWeightGr").textContent =
-        formatNumber(totalArrowWeightGr, 1) + " gr";
+      const totalEl = document.getElementById("totalArrowWeightGr");
+      const focEl = document.getElementById("focPercent");
+      const gppEl = document.getElementById("grainsPerPound");
+      const shaftGpiEl = document.getElementById("shaftGpi");
+      const arrowGpiEl = document.getElementById("arrowGpi");
+      const spineDisplayEl = document.getElementById("arrowSpineDisplay");
 
-      document.getElementById("focPercent").textContent =
-        isFinite(focPercent) ? formatNumber(focPercent, 1) + " %" : "–";
+      if (totalEl) {
+        totalEl.textContent = formatNumber(totalArrowWeightGr, 1) + " gr";
+      }
 
-      document.getElementById("grainsPerPound").textContent =
-        isFinite(grainsPerPound) ? formatNumber(grainsPerPound, 1) + " gpp" : "–";
+      if (focEl) {
+        focEl.textContent = isFinite(focPercent)
+          ? formatNumber(focPercent, 1) + " %"
+          : "–";
+      }
 
-      document.getElementById("shaftGpi").textContent =
-        isFinite(shaftGpi) ? formatNumber(shaftGpi, 2) + " gr/in" : "–";
+      if (gppEl) {
+        gppEl.textContent = isFinite(grainsPerPound)
+          ? formatNumber(grainsPerPound, 1) + " gpp"
+          : "–";
+      }
 
-      document.getElementById("arrowGpi").textContent =
-        isFinite(arrowGpi) ? formatNumber(arrowGpi, 2) + " gr/in" : "–";
+      if (shaftGpiEl) {
+        shaftGpiEl.textContent = isFinite(shaftGpi)
+          ? formatNumber(shaftGpi, 2) + " gr/in"
+          : "–";
+      }
+
+      if (arrowGpiEl) {
+        arrowGpiEl.textContent = isFinite(arrowGpi)
+          ? formatNumber(arrowGpi, 2) + " gr/in"
+          : "–";
+      }
+
+      if (spineDisplayEl) {
+        spineDisplayEl.textContent = arrowSpine > 0 ? arrowSpine.toString() : "–";
+      }
 
       // -----------------------------
       // FOC category tag (Low / Typical / High)
       // -----------------------------
       const focTag = document.getElementById("focTag");
-      focTag.style.display = isFinite(focPercent) ? "inline-block" : "none";
+      if (focTag) {
+        focTag.style.display = isFinite(focPercent) ? "inline-block" : "none";
 
-      if (isFinite(focPercent)) {
-        focTag.classList.remove("foc-low", "foc-normal", "foc-high");
-        let text = "";
-        if (focPercent < 10) {
-          focTag.classList.add("foc-low");
-          text = "Low";
-        } else if (focPercent <= 18) {
-          focTag.classList.add("foc-normal");
-          text = "Typical hunting";
-        } else {
-          focTag.classList.add("foc-high");
-          text = "High";
+        if (isFinite(focPercent)) {
+          focTag.classList.remove("foc-low", "foc-normal", "foc-high");
+          let text = "";
+          if (focPercent < 10) {
+            focTag.classList.add("foc-low");
+            text = "Low";
+          } else if (focPercent <= 18) {
+            focTag.classList.add("foc-normal");
+            text = "Typical hunting";
+          } else {
+            focTag.classList.add("foc-high");
+            text = "High";
+          }
+          focTag.textContent = text;
         }
-        focTag.textContent = text;
       }
 
       // -----------------------------
       // FOC visualization: move balance marker along bar
       // -----------------------------
       const balanceMarker = document.getElementById("balanceMarker");
-      if (arrowLengthIn > 0 && isFinite(balancePointIn)) {
-        let ratio = balancePointIn / arrowLengthIn;
-        // Clamp the ratio to [0, 1] so the marker stays within the bar
-        if (ratio < 0) ratio = 0;
-        if (ratio > 1) ratio = 1;
-        const percent = ratio * 100;
-        balanceMarker.style.left = percent + "%";
-      } else {
-        // If we can't calculate a valid position, default to the center
-        balanceMarker.style.left = "50%";
+      if (balanceMarker) {
+        if (arrowLengthIn > 0 && isFinite(balancePointIn)) {
+          let ratio = balancePointIn / arrowLengthIn;
+          // Clamp the ratio to [0, 1] so the marker stays within the bar
+          if (ratio < 0) ratio = 0;
+          if (ratio > 1) ratio = 1;
+          const percent = ratio * 100;
+          balanceMarker.style.left = percent + "%";
+        } else {
+          // If we can't calculate a valid position, default to the center
+          balanceMarker.style.left = "50%";
+        }
       }
 
       // -----------------------------
@@ -561,19 +719,21 @@
       const weightPoint = document.getElementById("weightPoint");
       const weightFletch = document.getElementById("weightFletch");
 
-      if (totalArrowWeightGr > 0) {
-        const shaftPct = (shaftWeightGr / totalArrowWeightGr) * 100;
-        const pointPct = (pointSystemWeightGr / totalArrowWeightGr) * 100;
-        const fletchPct = (fletchingSystemWeightGr / totalArrowWeightGr) * 100;
+      if (weightShaft && weightPoint && weightFletch) {
+        if (totalArrowWeightGr > 0) {
+          const shaftPct = (shaftWeightGr / totalArrowWeightGr) * 100;
+          const pointPct = (pointSystemWeightGr / totalArrowWeightGr) * 100;
+          const fletchPct = (fletchingSystemWeightGr / totalArrowWeightGr) * 100;
 
-        weightShaft.style.width = shaftPct + "%";
-        weightPoint.style.width = pointPct + "%";
-        weightFletch.style.width = fletchPct + "%";
-      } else {
-        // Neutral fallback if weights are not valid
-        weightShaft.style.width = "33%";
-        weightPoint.style.width = "33%";
-        weightFletch.style.width = "34%";
+          weightShaft.style.width = shaftPct + "%";
+          weightPoint.style.width = pointPct + "%";
+          weightFletch.style.width = fletchPct + "%";
+        } else {
+          // Neutral fallback if weights are not valid
+          weightShaft.style.width = "33%";
+          weightPoint.style.width = "33%";
+          weightFletch.style.width = "34%";
+        }
       }
     }
 
@@ -581,7 +741,7 @@
     // Initial setup & event wiring
     // -----------------------------
 
-    // Attach listeners to all input fields so that changes trigger recalculation.
+    // Numeric inputs that affect calculations
     const inputIds = [
       "bowDrawWeightLb",
       "bowDrawLengthIn",
@@ -594,12 +754,21 @@
       "insertWeightGr",
       "pointWeightGr",
       "balancePointIn",
+      "arrowSpine",
     ];
 
     inputIds.forEach((id) => {
       const el = document.getElementById(id);
-      el.addEventListener("input", calculateAndUpdate);
+      if (el) {
+        el.addEventListener("input", calculateAndUpdate);
+      }
     });
+
+    // Arrow name is text, so we update a separate display whenever it changes.
+    const arrowNameInput = document.getElementById("arrowName");
+    if (arrowNameInput) {
+      arrowNameInput.addEventListener("input", updateArrowNameDisplay);
+    }
 
     // Populate version and build date in the header.
     const versionEl = document.getElementById("appVersion");
@@ -611,7 +780,8 @@
       buildDateEl.textContent = "Build date: " + BUILD_DATE;
     }
 
-    // Run an initial calculation when the page loads so fields are populated.
+    // Run initial updates when the page loads.
+    updateArrowNameDisplay();
     calculateAndUpdate();
   </script>
 </body>
