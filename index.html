@@ -9,10 +9,11 @@
     Arrow Tune Calculator
     Author: David Marcus (GitHub: dmarcus-wire)
     Maintainer: David Marcus
+
     Description:
       A simple browser-based tool to calculate arrow weight, FOC,
       grains per pound, grains per inch, and basic kinetic data (FPS & momentum),
-      with simple visualizations.
+      with multiple visualizations focused on arrow balance and weight distribution.
 
     Tech:
       - Single self-contained HTML file (HTML + CSS + JS)
@@ -204,6 +205,15 @@
       color: #9ca3af;
     }
 
+    .arrow-ends {
+      display: flex;
+      justify-content: space-between;
+      max-width: 420px;
+      margin: 0 auto 2px;
+      font-size: 0.75rem;
+      color: #9ca3af;
+    }
+
     .weight-bar {
       margin-top: 8px;
       width: 100%;
@@ -235,6 +245,58 @@
       height: 8px;
       border-radius: 999px;
       margin-right: 4px;
+    }
+
+    /* FOC shift gauge: back vs front */
+    .foc-shift-visual {
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    .foc-shift-track {
+      position: relative;
+      width: 100%;
+      max-width: 420px;
+      height: 10px;
+      margin: 0 auto;
+      border-radius: 999px;
+      background: #020617;
+      border: 1px solid #111827;
+      overflow: hidden;
+    }
+
+    .foc-shift-zero {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      width: 2px;
+      height: 100%;
+      background: #4ade80;
+    }
+
+    .foc-shift-marker {
+      position: absolute;
+      top: -2px;
+      width: 10px;
+      height: 14px;
+      border-radius: 999px;
+      background: #f97316;
+      transform: translateX(-50%);
+    }
+
+    .foc-shift-labels {
+      display: flex;
+      justify-content: space-between;
+      max-width: 420px;
+      margin: 3px auto 0;
+      font-size: 0.75rem;
+      color: #9ca3af;
+    }
+
+    .foc-shift-details {
+      margin-top: 4px;
+      font-size: 0.8rem;
+      color: #e5e7eb;
     }
 
     .note {
@@ -554,7 +616,13 @@
         <!-- FOC & weight visuals -->
         <div class="card">
           <h2>FOC & Weight Distribution</h2>
+
+          <!-- Main FOC visualization: Nock -> Point -->
           <div class="arrow-visual">
+            <div class="arrow-ends">
+              <span>Nock / back of arrow</span>
+              <span>Point / front of arrow</span>
+            </div>
             <div class="arrow-track">
               <div class="arrow-axis"></div>
               <div class="arrow-center-line"></div>
@@ -565,6 +633,7 @@
             </div>
           </div>
 
+          <!-- Weight composition bar -->
           <div class="weight-visual">
             <div class="weight-bar">
               <div id="weightShaft" class="weight-shaft"></div>
@@ -575,6 +644,21 @@
               <span><span class="dot" style="background:#1d4ed8;"></span> Shaft</span>
               <span><span class="dot" style="background:#ea580c;"></span> Point system</span>
               <span><span class="dot" style="background:#a855f7;"></span> Nock / wrap / vanes + glue</span>
+            </div>
+          </div>
+
+          <!-- FOC shift gauge -->
+          <div class="foc-shift-visual">
+            <div class="foc-shift-track">
+              <div class="foc-shift-zero"></div>
+              <div id="focShiftMarker" class="foc-shift-marker"></div>
+            </div>
+            <div class="foc-shift-labels">
+              <span>More weight toward nock / behind center</span>
+              <span>More weight toward point / forward of center</span>
+            </div>
+            <div class="foc-shift-details" id="focShiftDetails">
+              FOC shift: –
             </div>
           </div>
         </div>
@@ -611,13 +695,12 @@
     // -----------------------------
     // App metadata (easy to update)
     // -----------------------------
-    const APP_VERSION = "v0.4.0";
+    const APP_VERSION = "v0.5.0";
     const BUILD_DATE = "2025-11-23";
 
     // -----------------------------
     // Helper functions
     // -----------------------------
-
     function readNumber(id) {
       const el = document.getElementById(id);
       const value = parseFloat(el?.value ?? "");
@@ -638,10 +721,6 @@
       nameDisplay.textContent = value || "Unnamed arrow";
     }
 
-    /**
-     * Simple approximate model for arrow speed at a given distance.
-     * fpsLossPer10Yards is the speed lost per 10 yards of travel.
-     */
     function estimateFpsAtDistance(launchFps, fpsLossPer10Yards, distanceYards) {
       if (!isFinite(launchFps) || launchFps <= 0) return NaN;
       if (!isFinite(fpsLossPer10Yards) || fpsLossPer10Yards < 0) return launchFps;
@@ -651,20 +730,16 @@
       return v > 0 ? v : 0;
     }
 
-    /**
-     * Momentum in slug·ft/s from arrow weight (grains) and speed (fps).
-     * Using: mass (slugs) = grains / 225,400, then momentum = mass * velocity.
-     */
     function computeMomentumSlugFtPerSec(arrowWeightGrains, fps) {
       if (!isFinite(arrowWeightGrains) || !isFinite(fps)) return NaN;
       if (arrowWeightGrains <= 0 || fps <= 0) return NaN;
+      // mass (slugs) = grains / 225,400; momentum = mass * velocity.
       return (arrowWeightGrains * fps) / 225400;
     }
 
     // -----------------------------
     // Main calculation & UI update
     // -----------------------------
-
     function calculateAndUpdate() {
       // Bow
       const bowDrawWeightLb = readNumber("bowDrawWeightLb");
@@ -672,7 +747,7 @@
       const launchFps = readNumber("launchFps");
       const fpsLossPer10Yards = readNumber("fpsLossPer10Yards");
 
-      // Distances for kinetic estimates
+      // Distances
       const dist1Yards = readNumber("dist1Yards");
       const dist2Yards = readNumber("dist2Yards");
 
@@ -689,7 +764,7 @@
       const pointWeightGr = readNumber("pointWeightGr");
       const glueWeightGr = readNumber("glueWeightGr");
 
-      // Arrow attributes
+      // Attributes
       const balancePointIn = readNumber("balancePointIn");
       const arrowSpine = readNumber("arrowSpine");
 
@@ -705,20 +780,22 @@
       const totalArrowWeightGr =
         shaftWeightGr + pointSystemWeightGr + fletchingSystemWeightGr;
 
-      // FOC calculation:
+      // FOC
       let focPercent = NaN;
+      let focShiftIn = NaN;
       if (arrowLengthIn > 0) {
-        focPercent =
-          ((balancePointIn - arrowLengthIn / 2) / arrowLengthIn) * 100;
+        const centerIn = arrowLengthIn / 2;
+        focShiftIn = balancePointIn - centerIn; // + means forward of center
+        focPercent = (focShiftIn / arrowLengthIn) * 100;
       }
 
-      // Grains per pound (GPP)
+      // Grains per pound
       let grainsPerPound = NaN;
       if (bowDrawWeightLb > 0) {
         grainsPerPound = totalArrowWeightGr / bowDrawWeightLb;
       }
 
-      // Grains per inch
+      // GPI
       let shaftGpi = NaN;
       let arrowGpi = NaN;
       if (arrowLengthIn > 0) {
@@ -816,7 +893,7 @@
       }
 
       // -----------------------------
-      // FOC visualization
+      // FOC visualization along arrow (Nock -> Point)
       // -----------------------------
       const balanceMarker = document.getElementById("balanceMarker");
       if (balanceMarker) {
@@ -832,7 +909,53 @@
       }
 
       // -----------------------------
-      // Weight distribution
+      // FOC shift gauge (back vs front)
+      // -----------------------------
+      const focShiftMarker = document.getElementById("focShiftMarker");
+      const focShiftDetails = document.getElementById("focShiftDetails");
+
+      if (focShiftMarker) {
+        if (isFinite(focPercent)) {
+          const MAX_RANGE = 20; // +/- 20% range for visualization
+          let ratio = focPercent / MAX_RANGE; // -1 .. +1 typical
+          if (ratio < -1) ratio = -1;
+          if (ratio > 1) ratio = 1;
+          const percent = 50 + ratio * 50; // map -1..1 -> 0..100
+          focShiftMarker.style.left = percent + "%";
+        } else {
+          focShiftMarker.style.left = "50%";
+        }
+      }
+
+      if (focShiftDetails) {
+        if (isFinite(focShiftIn) && isFinite(focPercent)) {
+          const direction =
+            focShiftIn > 0
+              ? "forward of center"
+              : focShiftIn < 0
+              ? "behind center"
+              : "exactly at center";
+          const inches = Math.abs(focShiftIn);
+          if (inches === 0) {
+            focShiftDetails.textContent =
+              "FOC shift: 0.00 in (0.0 %) – balance at exact center.";
+          } else {
+            focShiftDetails.textContent =
+              "FOC shift: " +
+              formatNumber(inches, 2) +
+              " in (" +
+              formatNumber(Math.abs(focPercent), 1) +
+              " %) " +
+              direction +
+              ".";
+          }
+        } else {
+          focShiftDetails.textContent = "FOC shift: –";
+        }
+      }
+
+      // -----------------------------
+      // Weight distribution composition
       // -----------------------------
       const weightShaft = document.getElementById("weightShaft");
       const weightPoint = document.getElementById("weightPoint");
@@ -858,7 +981,6 @@
     // -----------------------------
     // Initial setup & event wiring
     // -----------------------------
-
     const inputIds = [
       "bowDrawWeightLb",
       "bowDrawLengthIn",
@@ -895,12 +1017,8 @@
 
     const versionEl = document.getElementById("appVersion");
     const buildDateEl = document.getElementById("buildDateText");
-    if (versionEl) {
-      versionEl.textContent = APP_VERSION;
-    }
-    if (buildDateEl) {
-      buildDateEl.textContent = "Build date: " + BUILD_DATE;
-    }
+    if (versionEl) versionEl.textContent = APP_VERSION;
+    if (buildDateEl) buildDateEl.textContent = "Build date: " + BUILD_DATE;
 
     updateArrowNameDisplay();
     calculateAndUpdate();
