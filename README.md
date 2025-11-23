@@ -45,11 +45,11 @@ Future Improvements (optional ideas)
 - [x] Add glue weight estimate field (5–10 grains typical)  
 
 ### Core Calculations
-- [ ] Add momentum calculation  
-- [ ] Add Feet Per Second (FPS):
-  - [ ] FPS at launch  
-  - [ ] FPS at 30 yards (editable)  
-  - [ ] FPS at 60 yards (editable)  
+- [x] Add momentum calculation  
+- [x] Add Feet Per Second (FPS):
+  - [x] FPS at launch  
+  - [x] FPS at 30 yards (editable)  
+  - [x] FPS at 60 yards (editable)  
 
 ---
 
