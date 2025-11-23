@@ -268,7 +268,7 @@
     <div class="grid">
       <!-- LEFT: INPUTS -->
       <div>
-        <!-- Arrow Info (new) -->
+        <!-- Arrow Info -->
         <div class="card">
           <h2>Arrow Info</h2>
           <div class="field">
@@ -412,6 +412,16 @@
               <input id="pointWeightGr" type="number" value="150" step="0.1" />
             </div>
           </div>
+
+          <div class="field">
+            <label
+              for="glueWeightGr"
+              title="Estimated total glue weight in grains (vanes, insert, nock). 5–10 grains is common."
+            >
+              Glue weight (gr, estimate)
+            </label>
+            <input id="glueWeightGr" type="number" value="8" step="0.1" />
+          </div>
         </div>
 
         <div class="card">
@@ -496,12 +506,12 @@
             <div class="weight-legend">
               <span><span class="dot" style="background:#1d4ed8;"></span> Shaft</span>
               <span><span class="dot" style="background:#ea580c;"></span> Point system</span>
-              <span><span class="dot" style="background:#a855f7;"></span> Nock / wrap / vanes</span>
+              <span><span class="dot" style="background:#a855f7;"></span> Nock / wrap / vanes + glue</span>
             </div>
           </div>
         </div>
 
-        <!-- Notes card (new) -->
+        <!-- Notes card -->
         <div class="card">
           <h2>Notes</h2>
           <div class="field">
@@ -533,7 +543,7 @@
     // -----------------------------
     // App metadata (easy to update)
     // -----------------------------
-    const APP_VERSION = "v0.2.0";
+    const APP_VERSION = "v0.3.0";
     const BUILD_DATE = "2025-11-23";
 
     // -----------------------------
@@ -592,6 +602,8 @@
       const insertWeightGr = readNumber("insertWeightGr");
       const pointWeightGr = readNumber("pointWeightGr");
 
+      const glueWeightGr = readNumber("glueWeightGr");
+
       const balancePointIn = readNumber("balancePointIn");
       const arrowSpine = readNumber("arrowSpine");
 
@@ -599,7 +611,10 @@
       const shaftWeightGr = bareShaftWeightGr;
       const pointSystemWeightGr = insertWeightGr + pointWeightGr;
       const fletchingSystemWeightGr =
-        nockWeightGr + wrapWeightGr + vaneCount * vaneWeightGr;
+        nockWeightGr +
+        wrapWeightGr +
+        vaneCount * vaneWeightGr +
+        glueWeightGr; // glue lumped in with rear/overall build
 
       const totalArrowWeightGr =
         shaftWeightGr + pointSystemWeightGr + fletchingSystemWeightGr;
@@ -753,6 +768,7 @@
       "vaneWeightGr",
       "insertWeightGr",
       "pointWeightGr",
+      "glueWeightGr",
       "balancePointIn",
       "arrowSpine",
     ];
