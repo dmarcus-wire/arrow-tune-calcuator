@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Arrow Tune Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: #020617;
+      color: #e5e7eb;
+    }
+
+    .page {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: #9ca3af;
+      margin-bottom: 16px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: #020617;
+      border-radius: 12px;
+      padding: 12px 14px;
+      border: 1px solid #1f2937;
+      margin-bottom: 12px;
+    }
+
+    .card h2 {
+      font-size: 1rem;
+      margin: 0 0 8px 0;
+      color: #e5e7eb;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 8px;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .field label {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      margin-bottom: 2px;
+    }
+
+    .field input {
+      border-radius: 6px;
+      border: 1px solid #1f2937;
+      padding: 6px 8px;
+      font-size: 0.9rem;
+      background: #020617;
+      color: #e5e7eb;
+      outline: none;
+    }
+
+    .field input:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 1px #1d4ed8;
+    }
+
+    .results-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+    }
+
+    .results-row span.label {
+      color: #9ca3af;
+    }
+
+    .results-row span.value {
+      font-weight: 600;
+      color: #e5e7eb;
+    }
+
+    .foc-tag {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      margin-left: 4px;
+    }
+
+    .foc-low { background: #3b0764; color: #e9d5ff; }
+    .foc-normal { background: #064e3b; color: #bbf7d0; }
+    .foc-high { background: #7f1d1d; color: #fecaca; }
+
+    .arrow-visual {
+      margin-top: 8px;
+      text-align: center;
+    }
+
+    .arrow-track {
+      position: relative;
+      width: 100%;
+      max-width: 420px;
+      height: 14px;
+      margin: 0 auto;
+      border-radius: 999px;
+      background: #020617;
+      border: 1px solid #111827;
+      overflow: hidden;
+    }
+
+    .arrow-center-line {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      width: 2px;
+      height: 100%;
+      background: #22c55e;
+    }
+
+    .arrow-balance-marker {
+      position: absolute;
+      top: 0;
+      width: 8px;
+      height: 100%;
+      border-radius: 999px;
+      background: #f97316;
+      transform: translateX(-50%);
+    }
+
+    .arrow-axis {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      height: 2px;
+      background: #1f2937;
+      transform: translateY(-50%);
+    }
+
+    .arrow-legend {
+      margin-top: 4px;
+      font-size: 0.75rem;
+      color: #9ca3af;
+    }
+
+    .weight-bar {
+      margin-top: 8px;
+      width: 100%;
+      max-width: 420px;
+      height: 14px;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid #111827;
+      background: #020617;
+      display: flex;
+    }
+    .weight-shaft { background: #1d4ed8; }
+    .weight-point { background: #ea580c; }
+    .weight-fletch { background: #a855f7; }
+
+    .weight-legend {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 4px;
+      font-size: 0.75rem;
+      color: #9ca3af;
+      flex-wrap: wrap;
+    }
+
+    .dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      margin-right: 4px;
+    }
+
+    .note {
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <h1>Arrow Calculator</h1>
+    <div class="subtitle">
+      Enter your bow and arrow details to see total weight, FOC, grains per pound, and grains per inch.
+    </div>
+
+    <div class="grid">
+      <!-- LEFT: INPUTS -->
+      <div>
+        <div class="card">
+          <h2>Bow</h2>
+          <div class="field-row">
+            <div class="field">
+              <label for="bowDrawWeightLb">Draw weight (lb)</label>
+              <input id="bowDrawWeightLb" type="number" value="70" step="0.1" />
+            </div>
+            <div class="field">
+              <label for="bowDrawLengthIn">Draw length (in)</label>
+              <input id="bowDrawLengthIn" type="number" value="28" step="0.1" />
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Arrow Shaft</h2>
+          <div class="field-row">
+            <div class="field">
+              <label for="arrowLengthIn">Arrow length (in)</label>
+              <input id="arrowLengthIn" type="number" value="28.25" step="0.01" />
+            </div>
+            <div class="field">
+              <label for="bareShaftWeightGr">Bare shaft weight (gr)</label>
+              <input id="bareShaftWeightGr" type="number" value="300" step="0.1" />
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Components</h2>
+          <div class="field-row">
+            <div class="field">
+              <label for="nockWeightGr">Nock weight (gr)</label>
+              <input id="nockWeightGr" type="number" value="10" step="0.1" />
+            </div>
+            <div class="field">
+              <label for="wrapWeightGr">Wrap weight (gr, optional)</label>
+              <input id="wrapWeightGr" type="number" value="0" step="0.1" />
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="vaneCount">Vane count</label>
+              <input id="vaneCount" type="number" value="3" step="1" />
+            </div>
+            <div class="field">
+              <label for="vaneWeightGr">Vane weight each (gr)</label>
+              <input id="vaneWeightGr" type="number" value="9" step="0.1" />
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="insertWeightGr">Insert / outsert (gr)</label>
+              <input id="insertWeightGr" type="number" value="50" step="0.1" />
+            </div>
+            <div class="field">
+              <label for="pointWeightGr">Point weight (gr)</label>
+              <input id="pointWeightGr" type="number" value="150" step="0.1" />
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Balance Point</h2>
+          <div class="field">
+            <label for="balancePointIn">
+              Balance point from nock (in)
+            </label>
+            <input id="balancePointIn" type="number" value="18.5" step="0.01" />
+          </div>
+          <div class="note">
+            Measure from the nock throat to the balance point of the finished arrow.
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: RESULTS & VISUAL -->
+      <div>
+        <div class="card">
+          <h2>Results</h2>
+          <div class="results-row">
+            <span class="label">Total arrow weight</span>
+            <span class="value" id="totalArrowWeightGr">–</span>
+          </div>
+          <div class="results-row">
+            <span class="label">
+              FOC
+              <span id="focTag" class="foc-tag foc-normal" style="display:none;"></span>
+            </span>
+            <span class="value" id="focPercent">–</span>
+          </div>
+          <div class="results-row">
+            <span class="label">Grains per pound (GPP)</span>
+            <span class="value" id="grainsPerPound">–</span>
+          </div>
+          <div class="results-row">
+            <span class="label">Shaft GPI (bare shaft)</span>
+            <span class="value" id="shaftGpi">–</span>
+          </div>
+          <div class="results-row">
+            <span class="label">Arrow GPI (full arrow)</span>
+            <span class="value" id="arrowGpi">–</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>FOC Visualization</h2>
+          <div class="arrow-visual">
+            <div class="arrow-track">
+              <div class="arrow-axis"></div>
+              <div class="arrow-center-line"></div>
+              <div id="balanceMarker" class="arrow-balance-marker"></div>
+            </div>
+            <div class="arrow-legend">
+              Green line = geometric center, orange marker = balance point.
+            </div>
+          </div>
+
+          <div class="weight-visual">
+            <div class="weight-bar">
+              <div id="weightShaft" class="weight-shaft"></div>
+              <div id="weightPoint" class="weight-point"></div>
+              <div id="weightFletch" class="weight-fletch"></div>
+            </div>
+            <div class="weight-legend">
+              <span><span class="dot" style="background:#1d4ed8;"></span> Shaft</span>
+              <span><span class="dot" style="background:#ea580c;"></span> Point system</span>
+              <span><span class="dot" style="background:#a855f7;"></span> Nock / wrap / vanes</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="note">
+          Tip: On your phone, you can usually “Add to Home Screen” from the browser menu to use this like an app.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- Helper: safely parse numbers ---
+    function readNumber(id) {
+      const el = document.getElementById(id);
+      const value = parseFloat(el.value);
+      return isNaN(value) ? 0 : value;
+    }
+
+    function formatNumber(value, digits) {
+      if (!isFinite(value)) return "–";
+      return value.toFixed(digits);
+    }
+
+    function calculateAndUpdate() {
+      // Read inputs
+      const bowDrawWeightLb = readNumber("bowDrawWeightLb");
+      const bowDrawLengthIn = readNumber("bowDrawLengthIn"); // not used yet, but kept for future features
+
+      const arrowLengthIn = readNumber("arrowLengthIn");
+      const bareShaftWeightGr = readNumber("bareShaftWeightGr");
+
+      const nockWeightGr = readNumber("nockWeightGr");
+      const wrapWeightGr = readNumber("wrapWeightGr");
+      const vaneCount = readNumber("vaneCount");
+      const vaneWeightGr = readNumber("vaneWeightGr");
+
+      const insertWeightGr = readNumber("insertWeightGr");
+      const pointWeightGr = readNumber("pointWeightGr");
+
+      const balancePointIn = readNumber("balancePointIn");
+
+      // Component weights
+      const shaftWeightGr = bareShaftWeightGr;
+      const pointSystemWeightGr = insertWeightGr + pointWeightGr;
+      const fletchingSystemWeightGr =
+        nockWeightGr + wrapWeightGr + vaneCount * vaneWeightGr;
+
+      const totalArrowWeightGr =
+        shaftWeightGr + pointSystemWeightGr + fletchingSystemWeightGr;
+
+      // FOC calculation:
+      // FOC% = ((balancePoint - (arrowLength / 2)) / arrowLength) * 100
+      let focPercent = NaN;
+      if (arrowLengthIn > 0) {
+        focPercent =
+          ((balancePointIn - arrowLengthIn / 2) / arrowLengthIn) * 100;
+      }
+
+      // Grains per pound (GPP)
+      let grainsPerPound = NaN;
+      if (bowDrawWeightLb > 0) {
+        grainsPerPound = totalArrowWeightGr / bowDrawWeightLb;
+      }
+
+      // Grains per inch (shaft vs full arrow)
+      let shaftGpi = NaN;
+      let arrowGpi = NaN;
+      if (arrowLengthIn > 0) {
+        shaftGpi = shaftWeightGr / arrowLengthIn;
+        arrowGpi = totalArrowWeightGr / arrowLengthIn;
+      }
+
+      // --- Update text outputs ---
+      document.getElementById("totalArrowWeightGr").textContent =
+        formatNumber(totalArrowWeightGr, 1) + " gr";
+
+      document.getElementById("focPercent").textContent =
+        isFinite(focPercent) ? formatNumber(focPercent, 1) + " %" : "–";
+
+      document.getElementById("grainsPerPound").textContent =
+        isFinite(grainsPerPound) ? formatNumber(grainsPerPound, 1) + " gpp" : "–";
+
+      document.getElementById("shaftGpi").textContent =
+        isFinite(shaftGpi) ? formatNumber(shaftGpi, 2) + " gr/in" : "–";
+
+      document.getElementById("arrowGpi").textContent =
+        isFinite(arrowGpi) ? formatNumber(arrowGpi, 2) + " gr/in" : "–";
+
+      // --- FOC "tag" (low / normal / high) ---
+      const focTag = document.getElementById("focTag");
+      focTag.style.display = isFinite(focPercent) ? "inline-block" : "none";
+
+      if (isFinite(focPercent)) {
+        focTag.classList.remove("foc-low", "foc-normal", "foc-high");
+        let text = "";
+        if (focPercent < 10) {
+          focTag.classList.add("foc-low");
+          text = "Low";
+        } else if (focPercent <= 18) {
+          focTag.classList.add("foc-normal");
+          text = "Typical hunting";
+        } else {
+          focTag.classList.add("foc-high");
+          text = "High";
+        }
+        focTag.textContent = text;
+      }
+
+      // --- FOC visualization: move balance marker along the bar ---
+      const balanceMarker = document.getElementById("balanceMarker");
+      if (arrowLengthIn > 0 && isFinite(balancePointIn)) {
+        let ratio = balancePointIn / arrowLengthIn;
+        if (ratio < 0) ratio = 0;
+        if (ratio > 1) ratio = 1;
+        const percent = ratio * 100;
+        balanceMarker.style.left = percent + "%";
+      } else {
+        balanceMarker.style.left = "50%";
+      }
+
+      // --- Weight distribution bar ---
+      const weightShaft = document.getElementById("weightShaft");
+      const weightPoint = document.getElementById("weightPoint");
+      const weightFletch = document.getElementById("weightFletch");
+
+      if (totalArrowWeightGr > 0) {
+        const shaftPct = (shaftWeightGr / totalArrowWeightGr) * 100;
+        const pointPct = (pointSystemWeightGr / totalArrowWeightGr) * 100;
+        const fletchPct = (fletchingSystemWeightGr / totalArrowWeightGr) * 100;
+
+        weightShaft.style.width = shaftPct + "%";
+        weightPoint.style.width = pointPct + "%";
+        weightFletch.style.width = fletchPct + "%";
+      } else {
+        weightShaft.style.width = "33%";
+        weightPoint.style.width = "33%";
+        weightFletch.style.width = "34%";
+      }
+    }
+
+    // Attach listeners to all inputs so changes update live
+    const inputIds = [
+      "bowDrawWeightLb",
+      "bowDrawLengthIn",
+      "arrowLengthIn",
+      "bareShaftWeightGr",
+      "nockWeightGr",
+      "wrapWeightGr",
+      "vaneCount",
+      "vaneWeightGr",
+      "insertWeightGr",
+      "pointWeightGr",
+      "balancePointIn",
+    ];
+
+    inputIds.forEach((id) => {
+      const el = document.getElementById(id);
+      el.addEventListener("input", calculateAndUpdate);
+    });
+
+    // Initial calculation on page load
+    calculateAndUpdate();
+  </script>
+</body>
+</html>
