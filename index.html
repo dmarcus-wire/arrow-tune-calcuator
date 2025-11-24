@@ -1047,7 +1047,7 @@
             <input
               id="buildNameInput"
               type="text"
-              placeholder="Will auto-fill with timestamp + weight + FOC + arrow/bow"
+              placeholder="Will auto-fill with bow + arrow + weight + draw"
             />
           </div>
 
@@ -1170,7 +1170,7 @@
               </li>
             </ul>
 
-            <p style="margin:4px 0;">
+            <p style="margin:4px 0%;">
               These bands help compare arrow builds, but
               <strong>tuning and shot placement matter more than the numbers alone.</strong>
             </p>
@@ -1326,16 +1326,16 @@
               class="traj-graph"
             >
               <!-- Axes: x = yards, y = feet -->
-              <line x1="0" y1="50" x2="100" x2="100" y2="50" class="traj-axis"></line>
-              <line x1="0" y1="10" x2="0" y2="50" class="traj-axis"></line>
+              <line x1="0" y1="50" x2="100" y2="50" class="traj-axis"></line>
+              <line x1="0" y1="8" x2="0" y2="50" class="traj-axis"></line>
 
               <!-- Axis labels -->
               <text x="50" y="58" text-anchor="middle" class="traj-label">
                 Distance (yards)
               </text>
               <text
-                x="2"
-                y="12"
+                x="4"
+                y="14"
                 text-anchor="start"
                 class="traj-label"
               >
@@ -1373,7 +1373,7 @@
                 class="traj-label"
               ></text>
 
-              <!-- Impact momentum label at right (raised & nudged left) -->
+              <!-- Impact momentum label at right -->
               <text
                 id="trajImpactMomentumLabel"
                 x="90"
@@ -2054,6 +2054,10 @@
 
       updateTrajectoryGraph(launchFpsUsed, arcRangeYards, impactMomentum);
 
+      // Capture the trajectory legend text for Data Table
+      const trajLegendEl = document.getElementById("trajGraphLegend");
+      const trajLegendText = trajLegendEl ? trajLegendEl.textContent.trim() : "";
+
       const balanceMarker = document.getElementById("balanceMarker");
       if (balanceMarker) {
         if (arrowLengthIn > 0 && isFinite(balancePointIn)) {
@@ -2246,6 +2250,7 @@
         rows.push(["Kinetics", "Speed @ Dist 2", "Calculated", isFinite(fps2) ? formatNumber(fps2, 0) : "–", "fps"]);
         rows.push(["Kinetics", "Momentum @ Dist 2", "Calculated", isFinite(momentum2) ? formatNumber(momentum2, 3) : "–", "slug·ft/s"]);
         rows.push(["Kinetics", "Game momentum band (farthest distance)", "Calculated", momentumBandResultStr, ""]);
+        rows.push(["Kinetics", "Trajectory arc summary", "Calculated", trajLegendText || "—", ""]);
 
         // Notes
         rows.push(["Notes", "Notes", "Input", userNotesStr || "—", ""]);
@@ -2263,7 +2268,7 @@
         tableBody.innerHTML = html;
       }
 
-      // ---- Auto-prefill Saved Build Name ----
+      // ---- Auto-prefill Saved Build Name (bow + arrow + weight + draw) ----
       const buildNameInput = document.getElementById("buildNameInput");
       if (buildNameInput) {
         const arrowNameRaw =
@@ -2271,20 +2276,21 @@
         const bowModelRaw = bowModelStr;
 
         const parts = [];
-        parts.push(timestampStr);
+        if (bowModelRaw) parts.push(bowModelRaw);
+        if (arrowNameRaw) parts.push(arrowNameRaw);
+
+        const tailParts = [];
         if (totalArrowWeightGr > 0) {
-          parts.push(formatNumber(totalArrowWeightGr, 1) + " gr");
+          tailParts.push(formatNumber(totalArrowWeightGr, 1) + " gr");
         }
-        if (isFinite(focPercent)) {
-          parts.push(formatNumber(focPercent, 1) + " % FOC");
+        if (bowDrawWeightLb > 0) {
+          tailParts.push(formatNumber(bowDrawWeightLb, 0) + "lb draw");
         }
-        if (arrowNameRaw) {
-          parts.push(arrowNameRaw);
-        } else if (bowModelRaw) {
-          parts.push(bowModelRaw);
+        if (tailParts.length) {
+          parts.push(tailParts.join(" "));
         }
 
-        const autoName = parts.join(" – ");
+        const autoName = parts.join(" ").trim();
         const currentVal = buildNameInput.value.trim();
         const lastAuto = window._lastAutoBuildName || "";
 
@@ -2375,17 +2381,17 @@
       }
     });
 
-    const arrowNameInput = document.getElementById("arrowName");
-    if (arrowNameInput) {
-      arrowNameInput.addEventListener("input", () => {
+    const arrowNameInputEl = document.getElementById("arrowName");
+    if (arrowNameInputEl) {
+      arrowNameInputEl.addEventListener("input", () => {
         updateArrowNameDisplay();
         calculateAndUpdate();
       });
     }
 
-    const bowModelInput = document.getElementById("bowModel");
-    if (bowModelInput) {
-      bowModelInput.addEventListener("input", calculateAndUpdate);
+    const bowModelInputEl = document.getElementById("bowModel");
+    if (bowModelInputEl) {
+      bowModelInputEl.addEventListener("input", calculateAndUpdate);
     }
 
     const notesEl = document.getElementById("userNotes");
