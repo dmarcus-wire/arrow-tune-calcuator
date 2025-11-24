@@ -494,7 +494,7 @@
     </div>
 
     <div class="meta">
-      <span id="appVersion">v0.9.3</span>
+      <span id="appVersion">v0.9.4</span>
       <span>•</span>
       <span id="buildDateText">Build date: 2025-11-23</span>
     </div>
@@ -774,6 +774,54 @@
             </span>
             <span class="value" id="arrowGpi">–</span>
           </div>
+
+          <div class="note">
+            <span
+              id="resultsHelpToggle"
+              class="help-badge"
+              title="Click to expand explanations of FOC, GPP, and GPI classifications."
+            >
+              Learn more about these bands
+            </span>
+          </div>
+
+          <div id="resultsHelpPanel" class="help-panel" style="display:none;">
+            <div class="note-strong">About FOC, GPP, and GPI Bands</div>
+
+            <p style="margin:4px 0;">
+              These classifications are based on common bowhunting tuning guidance, manufacturer data,
+              and widely adopted rules of thumb used by coaches and hunters.
+            </p>
+
+            <ul>
+              <li>
+                <strong>FOC (Front of Center)</strong><br />
+                • <em>Low (&lt;10%)</em> — more forgiving flight but less stable with broadheads<br />
+                • <em>Typical hunting (10–18%)</em> — most stable, good overall penetration<br />
+                • <em>High (&gt;18%)</em> — strong penetration, but can require careful spine tuning
+              </li>
+
+              <li>
+                <strong>GPP (Grains per Pound)</strong><br />
+                • <em>Light (&lt;5.3 gpp)</em> — fast &amp; flat but lower momentum<br />
+                • <em>Typical hunting (5.3–6.3 gpp)</em> — good blend of speed &amp; penetration<br />
+                • <em>Heavy (&gt;6.3 gpp)</em> — quieter, higher momentum, slower trajectory
+              </li>
+
+              <li>
+                <strong>GPI (Full arrow grains-per-inch)</strong><br />
+                • <em>Light (&lt;9.0 gpi)</em> — common for deer / longer shots<br />
+                • <em>Typical hunting (9.0–11.0 gpi)</em> — where most hunters land<br />
+                • <em>Heavy (11–13 gpi)</em> — elk, bear, penetration builds<br />
+                • <em>Ultra-heavy (&gt;13 gpi)</em> — Ashby-style setups, short-range focus
+              </li>
+            </ul>
+
+            <p style="margin:4px 0;">
+              These bands help compare arrow builds, but
+              <strong>tuning and shot placement matter more than the numbers alone.</strong>
+            </p>
+          </div>
         </div>
 
         <!-- Kinetics: FPS, Momentum & Trajectory -->
@@ -947,11 +995,11 @@
                 class="traj-label"
               ></text>
 
-              <!-- Impact momentum label at right -->
+              <!-- Impact momentum label at right (raised & nudged left) -->
               <text
                 id="trajImpactMomentumLabel"
-                x="98"
-                y="46"
+                x="90"
+                y="18"
                 text-anchor="end"
                 class="traj-label"
               ></text>
@@ -969,7 +1017,7 @@
             Visuals that show how weight is spread along the arrow and how far forward the balance point sits.
           </div>
 
-          <!-- 1) Arrow balance along length (moved above FOC gauge) -->
+          <!-- 1) Arrow balance along length (above FOC gauge) -->
           <div class="viz-block arrow-visual">
             <div class="viz-title">Arrow Balance (Nock → Point)</div>
             <div class="arrow-ends">
@@ -1274,7 +1322,7 @@
       angleLabel.textContent =
         angleDeg > 0 ? "~" + angleDeg.toFixed(1) + "°" : "";
 
-      // Impact momentum text at right
+      // Impact momentum text at right (positioned near top-right of the plot)
       if (isFinite(impactMomentum) && impactMomentum > 0) {
         impactLabel.textContent = "~" + impactMomentum.toFixed(3) + " slug·ft/s";
       } else {
@@ -1810,7 +1858,7 @@
       });
     }
 
-    // Help panel toggle
+    // Help panel toggle for Kinetics / momentum bands
     const bandsHelpToggle = document.getElementById("bandsHelpToggle");
     const bandsHelpPanel = document.getElementById("bandsHelpPanel");
     if (bandsHelpToggle && bandsHelpPanel) {
@@ -1819,6 +1867,19 @@
           bandsHelpPanel.style.display === "none" ||
           bandsHelpPanel.style.display === "";
         bandsHelpPanel.style.display = isHidden ? "block" : "none";
+      });
+    }
+
+    // Help panel toggle for Results (FOC/GPP/GPI)
+    const resultsHelpToggle = document.getElementById("resultsHelpToggle");
+    const resultsHelpPanel = document.getElementById("resultsHelpPanel");
+
+    if (resultsHelpToggle && resultsHelpPanel) {
+      resultsHelpToggle.addEventListener("click", () => {
+        const isHidden =
+          resultsHelpPanel.style.display === "none" ||
+          resultsHelpPanel.style.display === "";
+        resultsHelpPanel.style.display = isHidden ? "block" : "none";
       });
     }
 
