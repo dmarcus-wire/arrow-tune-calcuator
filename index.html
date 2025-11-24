@@ -451,7 +451,7 @@
     </div>
 
     <div class="meta">
-      <span id="appVersion">v0.9.0</span>
+      <span id="appVersion">v0.9.1</span>
       <span>•</span>
       <span id="buildDateText">Build date: 2025-11-23</span>
     </div>
@@ -822,7 +822,7 @@
                 value="80"
                 step="5"
                 style="width: 3.5rem; background:#020617; color:#e5e7eb; border:1px solid #1f2937; border-radius:4px; padding:2px 4px; font-size:0.75rem;"
-                title="Maximum distance (yards) for the displayed arc. Distance 2 will follow this when you change it."
+                title="Maximum distance (yards) for the displayed arc. The graph is always scaled 0–150 yd."
               /> yd (visual only)
             </div>
 
@@ -838,7 +838,7 @@
 
               <!-- Axis labels -->
               <text x="50" y="58" text-anchor="middle" class="traj-label">
-                Distance (yards)
+                Distance (yards) [0–150]
               </text>
               <text
                 x="2"
@@ -846,7 +846,7 @@
                 text-anchor="start"
                 class="traj-label"
               >
-                Height (feet)
+                Height (feet) [0–20]
               </text>
 
               <!-- Data line (yards -> feet arc) -->
@@ -1047,14 +1047,9 @@
 
     /**
      * Update a simple left→right trajectory arc:
-     *  - X axis = distance in yards (0 .. arcRangeYards)
-     *  - Y axis = height in feet (0 .. HmaxFeet)
-     * We draw a symmetric parabola peaking at mid-flight.
-     * Also shows:
-     *  - an approximate launch angle at the bow side
-     *  - impact momentum text at the right
-     *
-     * HmaxFeet scales with distance: shorter shots = flatter, longer = higher.
+     *  - X axis = distance in yards (fixed 0–150)
+     *  - Y axis = height in feet (fixed 0–20)
+     * The arc range slider chooses how far the arrow flies inside that frame.
      */
     function updateTrajectoryGraph(launchFps, arcRangeYards, impactMomentum) {
       const lineEl = document.getElementById("trajGraphLine");
@@ -1075,10 +1070,13 @@
         !impactLabel
       ) return;
 
+      const AXIS_MAX_YARDS = 150;       // fixed horizontal scale
+      const AXIS_MAX_HEIGHT_FEET = 20;  // fixed vertical scale (best-guess max at 150 yd)
+
       if (!isFinite(arcRangeYards) || arcRangeYards <= 0) {
         lineEl.setAttribute("points", "");
         legendEl.textContent =
-          "Left = bow, right = target. Arc height, angle & impact momentum are approximate.";
+          "Left = bow, right = target. Graph scaled 0–150 yd and 0–20 ft. Arc height, angle & impact momentum are approximate.";
         // move peak & angle elements off-canvas / clear text
         peakDot.setAttribute("cx", "-10");
         peakDot.setAttribute("cy", "-10");
@@ -1092,41 +1090,43 @@
         return;
       }
 
-      const distMaxYards = arcRangeYards;
+      // Clamp the requested arc range to the 0–150 yd frame
+      const effectiveRangeYards = Math.min(
+        Math.max(arcRangeYards, 0),
+        AXIS_MAX_YARDS
+      );
 
       // Use launch FPS if valid, otherwise assume ~280 fps as a baseline.
       const baseFps = isFinite(launchFps) && launchFps > 0 ? launchFps : 280;
       const speedFactor = 280 / baseFps; // slower arrows = slightly more arc
 
       // Peak height scaling:
-      //  - Ref: ~4.5 ft at 60 yards for a 280 fps arrow.
-      //  - Use quadratic scaling so short ranges are much flatter.
+      //   - For 60 yd and 280 fps, ~4.5 ft (our original reference)
+      //   - Grow roughly with distance^2 and adjust a bit for slower/faster bows
       const refRangeYards = 60;
-      const normalized = distMaxYards / refRangeYards; // <=1 for short, >1 for long
+      const normalized = effectiveRangeYards / refRangeYards;
       let HmaxFeet = 4.5 * normalized * normalized * speedFactor;
-      HmaxFeet = Math.max(0.1, Math.min(HmaxFeet, 12)); // clamp between 0.1 and 12 ft
+      // Do not exceed the fixed axis max
+      HmaxFeet = Math.max(0.1, Math.min(HmaxFeet, AXIS_MAX_HEIGHT_FEET));
 
       const steps = 30;
       const points = [];
 
       for (let i = 0; i <= steps; i++) {
         const t = i / steps; // 0..1 along the shot
-        const dYards = distMaxYards * t;
+        const dYards = effectiveRangeYards * t;
 
         // Symmetric parabola: 0 at start & end, Hmax at t=0.5
         const heightFeet = HmaxFeet * 4 * t * (1 - t); // 4t(1-t) peaks at t=0.5
 
         // Map to SVG:
-        //  - X: distance 0..distMaxYards -> 0..100
-        //  - Y: height 0..HmaxFeet -> 50..10 (ground at bottom, peak up)
-        const x = (dYards / distMaxYards) * 100;
-        let y;
-        if (HmaxFeet > 0) {
-          const yNorm = heightFeet / HmaxFeet; // 0..1
-          y = 50 - yNorm * 40; // 10..50
-        } else {
-          y = 50;
-        }
+        //  - X: distance 0..AXIS_MAX_YARDS -> 0..100
+        //  - Y: height 0..AXIS_MAX_HEIGHT_FEET -> 50..10
+        const x = (dYards / AXIS_MAX_YARDS) * 100;
+        let yNorm = heightFeet / AXIS_MAX_HEIGHT_FEET;
+        if (yNorm < 0) yNorm = 0;
+        if (yNorm > 1) yNorm = 1;
+        const y = 50 - yNorm * 40; // 10..50
 
         points.push(`${x},${y}`);
       }
@@ -1134,9 +1134,12 @@
       // Update arc line
       lineEl.setAttribute("points", points.join(" "));
 
-      // Peak point is at mid-flight: t = 0.5 -> x=50, y=10
-      const xPeak = 50;
-      const yPeak = 10;
+      // Peak point is at mid-flight (effectiveRangeYards / 2)
+      const midYards = effectiveRangeYards / 2;
+      const xPeak = (midYards / AXIS_MAX_YARDS) * 100;
+      const yPeakNorm = HmaxFeet / AXIS_MAX_HEIGHT_FEET;
+      const yPeak = 50 - yPeakNorm * 40;
+
       peakDot.setAttribute("cx", xPeak.toString());
       peakDot.setAttribute("cy", yPeak.toString());
       peakLabel.setAttribute("x", xPeak.toString());
@@ -1145,7 +1148,7 @@
 
       // Approximate launch angle from Hmax and range:
       // H/R ≈ (1/4)tan(theta) → theta ≈ arctan(4H/R)
-      const rangeFeet = distMaxYards * 3;
+      const rangeFeet = effectiveRangeYards * 3;
       let angleDeg = 0;
       if (rangeFeet > 0 && HmaxFeet > 0) {
         const angleRad = Math.atan((4 * HmaxFeet) / rangeFeet);
@@ -1175,15 +1178,15 @@
       }
 
       legendEl.textContent =
-        "Peak height ≈ " +
+        "Graph scaled 0–150 yd and 0–20 ft. Current arc ≈ " +
+        Math.round(effectiveRangeYards) +
+        " yd, peak height ≈ " +
         HmaxFeet.toFixed(1) +
         " ft, launch angle ≈ " +
         angleDeg.toFixed(1) +
         "°, impact ≈ " +
         (isFinite(impactMomentum) ? impactMomentum.toFixed(3) + " slug·ft/s" : "–") +
-        " (0–" +
-        Math.round(distMaxYards) +
-        " yd, visual only).";
+        ".";
     }
 
     // -----------------------------
