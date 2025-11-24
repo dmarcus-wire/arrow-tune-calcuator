@@ -474,6 +474,9 @@
       color: var(--text);
       margin-bottom: 4px;
       text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .traj-graph {
@@ -1178,9 +1181,18 @@
 
           <!-- 3) Trajectory arc visualization -->
           <div class="viz-block">
-            <div class="viz-title">3) Trajectory Arc (Distance vs Height)</div>
-            <div class="note" style="margin-top:0; margin-bottom:4px;">
-              Shows a simple arc from bow to target based on your arc range, with a little extra room beyond the target.
+            <div class="viz-title">
+              3) Trajectory Arc (Distance vs Height)
+              <button
+                class="info-btn"
+                data-info-target="trajectoryInfo"
+                title="Show information about this visualization"
+              >
+                i
+              </button>
+            </div>
+            <div id="trajectoryInfo" class="info-panel">
+              <p>Shows a simple arc from bow to target based on your arc range, with a little extra room beyond the target.</p>
             </div>
 
             <div class="note" style="margin-top:0; margin-bottom:4px;">
@@ -1282,7 +1294,20 @@
 
           <!-- 1) Arrow balance along length (above FOC gauge) -->
           <div class="viz-block arrow-visual">
-            <div class="viz-title">Arrow Balance (Nock → Point)</div>
+            <div class="viz-title">
+              Arrow Balance (Nock → Point)
+              <button
+                class="info-btn"
+                data-info-target="balanceVizInfo"
+                title="Show information about this visualization"
+              >
+                i
+              </button>
+            </div>
+            <div id="balanceVizInfo" class="info-panel">
+              <p>Green line = geometric center, orange marker = balance point (driven by FOC).</p>
+            </div>
+
             <div class="arrow-ends">
               <span>Nock / back of arrow</span>
               <span>Point / front of arrow</span>
@@ -1293,13 +1318,26 @@
               <div id="balanceMarker" class="arrow-balance-marker"></div>
             </div>
             <div class="arrow-legend">
-              Green line = geometric center, orange marker = balance point (driven by FOC).
+              Shows where along the shaft your arrow actually balances from nock to point.
             </div>
           </div>
 
           <!-- 2) FOC Shift Gauge -->
           <div class="viz-block foc-shift-visual">
-            <div class="viz-title">FOC Shift Gauge</div>
+            <div class="viz-title">
+              FOC Shift Gauge
+              <button
+                class="info-btn"
+                data-info-target="focShiftInfo"
+                title="Show information about this visualization"
+              >
+                i
+              </button>
+            </div>
+            <div id="focShiftInfo" class="info-panel">
+              <p>Shaded zone ≈ common bowhunting FOC range (~10–18% forward of center).</p>
+            </div>
+
             <div class="foc-shift-track">
               <!-- Recommended FOC band (~10–18% forward of center) -->
               <div class="foc-shift-band"></div>
@@ -1313,9 +1351,6 @@
             <div class="foc-shift-details" id="focShiftDetails">
               FOC shift: –
             </div>
-            <div class="note" style="margin-top:4px;">
-              Shaded zone ≈ common bowhunting FOC range (~10–18% forward of center).
-            </div>
           </div>
 
           <!-- 3) Weight composition bar -->
@@ -1326,15 +1361,13 @@
                 class="info-btn"
                 data-info-target="weightInfo"
                 title="Show information about this visualization"
-                style="margin-left:6px;"
               >i</button>
             </div>
 
             <div id="weightInfo" class="info-panel" style="display:none;">
               <p>
-                The center vertical line shows the 50% weight point.
-                If the blue shaft segment crosses this line,
-                more than half of your total arrow weight is in the shaft.
+                Center line shows the halfway mark: if the blue shaft segment crosses it,
+                more than half of total arrow weight is in the shaft.
               </p>
             </div>
 
@@ -1625,6 +1658,8 @@
       const componentTotal =
         shaftWeightGr + pointSystemWeightGr + fletchingSystemWeightGr;
 
+      let weightCompString = "–";
+
       const componentComplete =
         shaftWeightGr > 0 &&
         nockWeightGr > 0 &&
@@ -1869,9 +1904,9 @@
               Math.round(farthestDist) +
               " yd: " +
               formatNumber(momentumFar, 3) +
-              " slug·ft/s → in the '" +
+              " slug·ft/s → classified as '" +
               bandName +
-              "' band.";
+              "'.";
             momentumBandLabel.textContent = txt;
             momentumBandResultStr = txt;
           }
@@ -1980,6 +2015,23 @@
               formatNumber(fletchPct, 1) +
               " %)";
           }
+
+          weightCompString =
+            "Shaft: " +
+            formatNumber(shaftWeightGr, 1) +
+            " gr (" +
+            formatNumber(shaftPct, 1) +
+            " %)<br>" +
+            "Point system: " +
+            formatNumber(pointSystemWeightGr, 1) +
+            " gr (" +
+            formatNumber(pointPct, 1) +
+            " %)<br>" +
+            "Nock / wrap / vanes + glue: " +
+            formatNumber(fletchingSystemWeightGr, 1) +
+            " gr (" +
+            formatNumber(fletchPct, 1) +
+            " %)";
         } else {
           weightShaft.style.width = "33%";
           weightPoint.style.width = "33%";
@@ -1990,6 +2042,7 @@
               "Point system: – gr (– %)<br>" +
               "Nock / wrap / vanes + glue: – gr (– %)";
           }
+          weightCompString = "–";
         }
       }
 
@@ -2000,7 +2053,7 @@
         // Meta
         rows.push(["Meta", "Timestamp", "Auto", timestampStr, ""]);
 
-        // Arrow (moved up to appear right after timestamp)
+        // Arrow (right after timestamp)
         rows.push(["Arrow", "Name", "Input", arrowNameStr, ""]);
         rows.push(["Arrow", "Spine", "Input", arrowSpine > 0 ? arrowSpine.toString() : "–", ""]);
         rows.push(["Arrow", "Arrow length", "Input", formatNumber(arrowLengthIn, 2), "in"]);
@@ -2046,6 +2099,7 @@
         rows.push(["Calculated", "Shaft GPI (bare)", "Calculated", isFinite(shaftGpi) ? formatNumber(shaftGpi, 2) : "–", "gr/in"]);
         rows.push(["Calculated", "Arrow GPI (full)", "Calculated", isFinite(arrowGpi) ? formatNumber(arrowGpi, 2) : "–", "gr/in"]);
         rows.push(["Calculated", "Arrow GPI band", "Calculated", gpiBandLabel || "–", ""]);
+        rows.push(["Calculated", "Weight composition", "Calculated", weightCompString, ""]);
 
         // Kinetics
         rows.push(["Kinetics", "Launch speed", "Calculated", isFinite(launchFpsUsed) ? formatNumber(launchFpsUsed, 0) : "–", "fps"]);
