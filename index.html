@@ -440,7 +440,7 @@
     </div>
 
     <div class="meta">
-      <span id="appVersion">v0.8.7</span>
+      <span id="appVersion">v0.8.8</span>
       <span>•</span>
       <span id="buildDateText">Build date: 2025-11-23</span>
     </div>
@@ -934,6 +934,9 @@
               <span><span class="dot" style="background:#ea580c;"></span> Point system</span>
               <span><span class="dot" style="background:#a855f7;"></span> Nock / wrap / vanes + glue</span>
             </div>
+            <div class="note" id="weightTotals">
+              Shaft: – gr (– %) • Point system: – gr (– %) • Nock / wrap / vanes + glue: – gr (– %)
+            </div>
             <div class="note">
               Center line shows the halfway mark: if the blue shaft segment crosses it, more than half of total arrow weight is in the shaft.
             </div>
@@ -1208,7 +1211,7 @@
         nockWeightGr +
         wrapWeightGr +
         vaneCount * vaneWeightGr +
-        glueWeightGr;
+        glueWeightGr; // nock + wrap + vanes + glue
 
       const totalArrowWeightGr =
         shaftWeightGr + pointSystemWeightGr + fletchingSystemWeightGr;
@@ -1464,6 +1467,7 @@
       const weightShaft = document.getElementById("weightShaft");
       const weightPoint = document.getElementById("weightPoint");
       const weightFletch = document.getElementById("weightFletch");
+      const weightTotalsEl = document.getElementById("weightTotals");
 
       if (weightShaft && weightPoint && weightFletch) {
         if (totalArrowWeightGr > 0) {
@@ -1475,10 +1479,31 @@
           weightShaft.style.width = shaftPct + "%";
           weightPoint.style.width = pointPct + "%";
           weightFletch.style.width = fletchPct + "%";
+
+          if (weightTotalsEl) {
+            weightTotalsEl.textContent =
+              "Shaft: " +
+              formatNumber(shaftWeightGr, 1) +
+              " gr (" +
+              formatNumber(shaftPct, 1) +
+              " %) • Point system: " +
+              formatNumber(pointSystemWeightGr, 1) +
+              " gr (" +
+              formatNumber(pointPct, 1) +
+              " %) • Nock / wrap / vanes + glue: " +
+              formatNumber(fletchingSystemWeightGr, 1) +
+              " gr (" +
+              formatNumber(fletchPct, 1) +
+              " %)";
+          }
         } else {
           weightShaft.style.width = "33%";
           weightPoint.style.width = "33%";
           weightFletch.style.width = "34%";
+          if (weightTotalsEl) {
+            weightTotalsEl.textContent =
+              "Shaft: – gr (– %) • Point system: – gr (– %) • Nock / wrap / vanes + glue: – gr (– %)";
+          }
         }
       }
     }
