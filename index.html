@@ -82,8 +82,14 @@
 
     .card h2 {
       font-size: 1rem;
-      margin: 0 0 10px 0;
+      margin: 0 0 6px 0;
       color: #e5e7eb;
+    }
+
+    .card .card-subtitle {
+      font-size: 0.75rem;
+      color: #9ca3af;
+      margin-bottom: 8px;
     }
 
     .field {
@@ -441,6 +447,43 @@
     .help-panel li {
       margin: 2px 0;
     }
+
+    /* Data table */
+    .data-table-wrapper {
+      overflow-x: auto;
+      margin-top: 4px;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.75rem;
+      min-width: 100%;
+    }
+
+    .data-table th,
+    .data-table td {
+      border: 1px solid #1f2937;
+      padding: 4px 6px;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    .data-table th {
+      background: #020617;
+      color: #9ca3af;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    .data-table tbody tr:nth-child(odd) {
+      background: #020617;
+    }
+
+    .data-table tbody tr:nth-child(even) {
+      background: #030712;
+    }
   </style>
 </head>
 <body>
@@ -451,7 +494,7 @@
     </div>
 
     <div class="meta">
-      <span id="appVersion">v0.9.1</span>
+      <span id="appVersion">v0.9.2</span>
       <span>•</span>
       <span id="buildDateText">Build date: 2025-11-23</span>
     </div>
@@ -462,6 +505,9 @@
         <!-- Bow -->
         <div class="card">
           <h2>Bow</h2>
+          <div class="card-subtitle">
+            Basic bow setup so we can relate arrow weight to draw weight and estimate speed and momentum.
+          </div>
           <div class="field-row">
             <div class="field">
               <label
@@ -520,6 +566,9 @@
         <!-- Arrow Info -->
         <div class="card">
           <h2>Arrow Info</h2>
+          <div class="card-subtitle">
+            High-level info so you can label and compare different arrow builds.
+          </div>
           <div class="field">
             <label
               for="arrowName"
@@ -552,6 +601,9 @@
         <!-- Arrow Shaft -->
         <div class="card">
           <h2>Arrow Shaft</h2>
+          <div class="card-subtitle">
+            The core shaft length and bare weight that everything else builds on.
+          </div>
           <div class="field-row">
             <div class="field">
               <label
@@ -577,6 +629,9 @@
         <!-- Components -->
         <div class="card">
           <h2>Components</h2>
+          <div class="card-subtitle">
+            All the parts you bolt onto the shaft that drive total weight and front-of-center.
+          </div>
           <div class="field-row">
             <div class="field">
               <label
@@ -654,6 +709,9 @@
         <!-- Balance Point -->
         <div class="card">
           <h2>Balance Point</h2>
+          <div class="card-subtitle">
+            Where the finished arrow actually balances, which drives FOC and front/back weight bias.
+          </div>
           <div class="field">
             <label
               for="balancePointIn"
@@ -674,6 +732,9 @@
         <!-- Core results -->
         <div class="card">
           <h2>Results</h2>
+          <div class="card-subtitle">
+            Big-picture summary of your arrow build: total weight, FOC, grains per pound, and grains per inch.
+          </div>
 
           <div class="results-row">
             <span class="label">Arrow</span>
@@ -718,6 +779,9 @@
         <!-- Kinetics: FPS, Momentum & Trajectory -->
         <div class="card">
           <h2>Kinetics (FPS, Momentum & Trajectory)</h2>
+          <div class="card-subtitle">
+            How hard and how fast the arrow is moving at the bow and downrange, plus a simplified flight arc.
+          </div>
 
           <div class="results-row">
             <span class="label">Launch</span>
@@ -751,7 +815,7 @@
                   value="60"
                   step="1"
                   style="width: 3rem; background:#020617; color:#e5e7eb; border:1px solid #1f2937; border-radius:4px; padding:2px 4px; font-size:0.75rem;"
-                  title="Distance in yards for the second FPS/momentum estimate. Arc range will try to keep this in sync."
+                  title="Distance in yards for the second FPS/momentum estimate. This also drives the arc range."
                 /> yd)
               </span>
             </span>
@@ -813,6 +877,9 @@
           <!-- Trajectory arc visualization -->
           <div class="viz-block">
             <div class="viz-title">Trajectory Arc (Distance vs Height)</div>
+            <div class="note" style="margin-top:0; margin-bottom:4px;">
+              Shows a simple arc from bow to target based on your arc range, with a little extra room beyond the target.
+            </div>
 
             <div class="note" style="margin-top:0; margin-bottom:4px;">
               Arc range:
@@ -822,7 +889,7 @@
                 value="80"
                 step="5"
                 style="width: 3.5rem; background:#020617; color:#e5e7eb; border:1px solid #1f2937; border-radius:4px; padding:2px 4px; font-size:0.75rem;"
-                title="Maximum distance (yards) for the displayed arc. The graph is always scaled 0–150 yd."
+                title="Maximum distance (yards) for the displayed arc. Horizontal axis will extend about 5 yards beyond this."
               /> yd (visual only)
             </div>
 
@@ -838,7 +905,7 @@
 
               <!-- Axis labels -->
               <text x="50" y="58" text-anchor="middle" class="traj-label">
-                Distance (yards) [0–150]
+                Distance (yards)
               </text>
               <text
                 x="2"
@@ -846,7 +913,7 @@
                 text-anchor="start"
                 class="traj-label"
               >
-                Height (feet) [0–20]
+                Height (feet)
               </text>
 
               <!-- Data line (yards -> feet arc) -->
@@ -898,6 +965,9 @@
         <!-- FOC & weight visuals -->
         <div class="card">
           <h2>FOC & Weight Distribution</h2>
+          <div class="card-subtitle">
+            Visuals that show how weight is spread along the arrow and how far forward the balance point sits.
+          </div>
 
           <!-- 1) FOC Shift Gauge -->
           <div class="viz-block foc-shift-visual">
@@ -960,9 +1030,33 @@
           </div>
         </div>
 
+        <!-- Data Table -->
+        <div class="card">
+          <h2>Data Table (Inputs & Calculated)</h2>
+          <div class="card-subtitle">
+            Spreadsheet-style view of what you entered and what the calculator derived from it.
+          </div>
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Field</th>
+                  <th>Value</th>
+                  <th>Units</th>
+                </tr>
+              </thead>
+              <tbody id="summaryTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
         <!-- Notes -->
         <div class="card">
           <h2>Notes</h2>
+          <div class="card-subtitle">
+            Freeform notes for this build — tuning details, hunts, broadheads used, and anything else you want to remember.
+          </div>
           <div class="field">
             <label
               for="userNotes"
@@ -1047,9 +1141,10 @@
 
     /**
      * Update a simple left→right trajectory arc:
-     *  - X axis = distance in yards (fixed 0–150)
-     *  - Y axis = height in feet (fixed 0–20)
-     * The arc range slider chooses how far the arrow flies inside that frame.
+     *  - X axis = distance in yards (0 → arcRangeYards + ~5 yd)
+     *  - Y axis = height in feet (fixed 0–20 ft)
+     * The arc range slider chooses how far the arrow flies; the graph adds a little extra
+     * horizontal space beyond that.
      */
     function updateTrajectoryGraph(launchFps, arcRangeYards, impactMomentum) {
       const lineEl = document.getElementById("trajGraphLine");
@@ -1070,13 +1165,12 @@
         !impactLabel
       ) return;
 
-      const AXIS_MAX_YARDS = 150;       // fixed horizontal scale
-      const AXIS_MAX_HEIGHT_FEET = 20;  // fixed vertical scale (best-guess max at 150 yd)
+      const AXIS_MAX_HEIGHT_FEET = 20;  // fixed vertical scale
 
       if (!isFinite(arcRangeYards) || arcRangeYards <= 0) {
         lineEl.setAttribute("points", "");
         legendEl.textContent =
-          "Left = bow, right = target. Graph scaled 0–150 yd and 0–20 ft. Arc height, angle & impact momentum are approximate.";
+          "Left = bow, right = target. Arc height, angle & impact momentum are approximate.";
         // move peak & angle elements off-canvas / clear text
         peakDot.setAttribute("cx", "-10");
         peakDot.setAttribute("cy", "-10");
@@ -1090,11 +1184,8 @@
         return;
       }
 
-      // Clamp the requested arc range to the 0–150 yd frame
-      const effectiveRangeYards = Math.min(
-        Math.max(arcRangeYards, 0),
-        AXIS_MAX_YARDS
-      );
+      const effectiveRangeYards = Math.max(arcRangeYards, 0);
+      const axisMaxYards = Math.max(effectiveRangeYards + 5, 10); // always at least 10 yd wide
 
       // Use launch FPS if valid, otherwise assume ~280 fps as a baseline.
       const baseFps = isFinite(launchFps) && launchFps > 0 ? launchFps : 280;
@@ -1120,9 +1211,9 @@
         const heightFeet = HmaxFeet * 4 * t * (1 - t); // 4t(1-t) peaks at t=0.5
 
         // Map to SVG:
-        //  - X: distance 0..AXIS_MAX_YARDS -> 0..100
+        //  - X: distance 0..axisMaxYards -> 0..100
         //  - Y: height 0..AXIS_MAX_HEIGHT_FEET -> 50..10
-        const x = (dYards / AXIS_MAX_YARDS) * 100;
+        const x = (dYards / axisMaxYards) * 100;
         let yNorm = heightFeet / AXIS_MAX_HEIGHT_FEET;
         if (yNorm < 0) yNorm = 0;
         if (yNorm > 1) yNorm = 1;
@@ -1136,7 +1227,7 @@
 
       // Peak point is at mid-flight (effectiveRangeYards / 2)
       const midYards = effectiveRangeYards / 2;
-      const xPeak = (midYards / AXIS_MAX_YARDS) * 100;
+      const xPeak = (midYards / axisMaxYards) * 100;
       const yPeakNorm = HmaxFeet / AXIS_MAX_HEIGHT_FEET;
       const yPeak = 50 - yPeakNorm * 40;
 
@@ -1178,9 +1269,11 @@
       }
 
       legendEl.textContent =
-        "Graph scaled 0–150 yd and 0–20 ft. Current arc ≈ " +
+        "Horizontal axis ≈ 0–" +
+        Math.round(axisMaxYards) +
+        " yd (arc set to ~" +
         Math.round(effectiveRangeYards) +
-        " yd, peak height ≈ " +
+        " yd). Peak height ≈ " +
         HmaxFeet.toFixed(1) +
         " ft, launch angle ≈ " +
         angleDeg.toFixed(1) +
@@ -1258,6 +1351,12 @@
         shaftGpi = shaftWeightGr / arrowLengthIn;
         arrowGpi = totalArrowWeightGr / arrowLengthIn;
       }
+
+      // Read arrow name for the data table
+      const arrowNameInput = document.getElementById("arrowName");
+      const arrowNameStr = arrowNameInput
+        ? (arrowNameInput.value.trim() || "Unnamed arrow")
+        : "Unnamed arrow";
 
       // -----------------------------
       // Core numeric results
@@ -1574,6 +1673,70 @@
           }
         }
       }
+
+      // -----------------------------
+      // Data table: inputs & calculated values
+      // -----------------------------
+      const tableBody = document.getElementById("summaryTableBody");
+      if (tableBody) {
+        const rows = [];
+
+        // Bow
+        rows.push(["Bow", "Draw weight", formatNumber(bowDrawWeightLb, 1), "lb"]);
+        rows.push(["Bow", "Draw length", formatNumber(bowDrawLengthIn, 1), "in"]);
+        rows.push(["Bow", "Launch speed estimate", formatNumber(launchFps, 0), "fps"]);
+        rows.push(["Bow", "Speed loss / 10 yd", formatNumber(fpsLossPer10Yards, 1), "fps/10yd"]);
+
+        // Distances & arc
+        rows.push(["Distances", "Distance 1", formatNumber(dist1Yards, 0), "yd"]);
+        rows.push(["Distances", "Distance 2", formatNumber(dist2Yards, 0), "yd"]);
+        rows.push(["Distances", "Arc range (visual)", formatNumber(arcRangeYards, 0), "yd"]);
+
+        // Arrow info
+        rows.push(["Arrow", "Name", arrowNameStr, ""]);
+        rows.push(["Arrow", "Spine", arrowSpine > 0 ? arrowSpine.toString() : "–", ""]);
+        rows.push(["Arrow", "Arrow length", formatNumber(arrowLengthIn, 2), "in"]);
+        rows.push(["Arrow", "Bare shaft weight", formatNumber(bareShaftWeightGr, 1), "gr"]);
+
+        // Components
+        rows.push(["Components", "Nock weight", formatNumber(nockWeightGr, 1), "gr"]);
+        rows.push(["Components", "Wrap weight", formatNumber(wrapWeightGr, 1), "gr"]);
+        rows.push(["Components", "Vane count", formatNumber(vaneCount, 0), ""]);
+        rows.push(["Components", "Vane weight each", formatNumber(vaneWeightGr, 1), "gr"]);
+        rows.push(["Components", "Insert / outsert", formatNumber(insertWeightGr, 1), "gr"]);
+        rows.push(["Components", "Point weight", formatNumber(pointWeightGr, 1), "gr"]);
+        rows.push(["Components", "Glue weight (est.)", formatNumber(glueWeightGr, 1), "gr"]);
+
+        // Balance
+        rows.push(["Balance", "Balance point from nock", formatNumber(balancePointIn, 2), "in"]);
+
+        // Calculated totals & ratios
+        rows.push(["Calculated", "Total arrow weight", formatNumber(totalArrowWeightGr, 1), "gr"]);
+        rows.push(["Calculated", "FOC", isFinite(focPercent) ? formatNumber(focPercent, 1) : "–", "%"]);
+        rows.push(["Calculated", "Grains per pound (GPP)", isFinite(grainsPerPound) ? formatNumber(grainsPerPound, 1) : "–", "gpp"]);
+        rows.push(["Calculated", "Shaft GPI (bare)", isFinite(shaftGpi) ? formatNumber(shaftGpi, 2) : "–", "gr/in"]);
+        rows.push(["Calculated", "Arrow GPI (full)", isFinite(arrowGpi) ? formatNumber(arrowGpi, 2) : "–", "gr/in"]);
+
+        // Kinetics / momentum
+        rows.push(["Kinetics", "Launch speed", isFinite(launchFpsUsed) ? formatNumber(launchFpsUsed, 0) : "–", "fps"]);
+        rows.push(["Kinetics", "Launch momentum", isFinite(launchMomentum) ? formatNumber(launchMomentum, 3) : "–", "slug·ft/s"]);
+        rows.push(["Kinetics", "Speed @ Dist 1", isFinite(fps1) ? formatNumber(fps1, 0) : "–", "fps"]);
+        rows.push(["Kinetics", "Momentum @ Dist 1", isFinite(momentum1) ? formatNumber(momentum1, 3) : "–", "slug·ft/s"]);
+        rows.push(["Kinetics", "Speed @ Dist 2", isFinite(fps2) ? formatNumber(fps2, 0) : "–", "fps"]);
+        rows.push(["Kinetics", "Momentum @ Dist 2", isFinite(momentum2) ? formatNumber(momentum2, 3) : "–", "slug·ft/s"]);
+
+        // Fill table body
+        let html = "";
+        for (const [cat, field, value, units] of rows) {
+          html += "<tr>" +
+            "<td>" + cat + "</td>" +
+            "<td>" + field + "</td>" +
+            "<td>" + value + "</td>" +
+            "<td>" + units + "</td>" +
+            "</tr>";
+        }
+        tableBody.innerHTML = html;
+      }
     }
 
     // -----------------------------
@@ -1611,19 +1774,25 @@
     if (arrowNameInput) {
       arrowNameInput.addEventListener("input", () => {
         updateArrowNameDisplay();
+        calculateAndUpdate();
       });
     }
 
-    // Keep Distance 2 loosely connected to Arc range: when arc changes, update dist2
+    // Distance 2 drives Arc range (one-way)
     const trajInput = document.getElementById("trajMaxDistanceYards");
     const dist2Input = document.getElementById("dist2Yards");
     if (trajInput && dist2Input) {
-      // Initial sync on load
-      dist2Input.value = trajInput.value;
+      // Initial sync: arc range follows Distance 2's initial value
+      trajInput.value = dist2Input.value;
 
+      // When Distance 2 changes, update Arc range (Trajectory Arc) to match
+      dist2Input.addEventListener("input", () => {
+        trajInput.value = dist2Input.value;
+        calculateAndUpdate();
+      });
+
+      // When arc range is edited directly, just recalc (do NOT override Distance 2)
       trajInput.addEventListener("input", () => {
-        const v = readNumber("trajMaxDistanceYards");
-        dist2Input.value = v > 0 ? v : "";
         calculateAndUpdate();
       });
     }
