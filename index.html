@@ -609,6 +609,52 @@
     #themeToggle span {
       font-size: 0.7rem;
     }
+
+    .csv-controls {
+      margin-bottom: 6px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .csv-btn {
+      border: none;
+      border-radius: 999px;
+      padding: 3px 8px;
+      font-size: 0.7rem;
+      cursor: pointer;
+      background: var(--bg-elevated);
+      color: var(--text);
+      border: 1px solid var(--border-soft);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition:
+        background-color 0.35s ease,
+        color 0.35s ease,
+        border-color 0.35s ease;
+    }
+
+    .csv-btn:hover {
+      border-color: #3b82f6;
+    }
+
+    .csv-btn span {
+      font-size: 0.8rem;
+    }
+
+    .csv-upload-label {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .csv-upload-label input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -1407,6 +1453,23 @@
           </div>
           <div id="dataTableInfo" class="info-panel">
             <p>Spreadsheet-style view of what you entered and what the calculator derived from it, with source labels.</p>
+            <p>You can copy or download this table as CSV, and later re-upload it to restore your input values.</p>
+          </div>
+
+          <div class="csv-controls">
+            <button id="copyCsvBtn" class="csv-btn" type="button">
+              <span>📋</span>
+              <span>Copy table CSV</span>
+            </button>
+            <button id="downloadCsvBtn" class="csv-btn" type="button">
+              <span>💾</span>
+              <span>Download table CSV</span>
+            </button>
+            <label class="csv-btn csv-upload-label">
+              <span>📂</span>
+              <span>Upload CSV (restore inputs)</span>
+              <input id="uploadInputsCsv" type="file" accept=".csv" />
+            </label>
           </div>
 
           <div class="data-table-wrapper">
@@ -1643,6 +1706,9 @@
 
       const userNotesEl = document.getElementById("userNotes");
       const userNotesStr = userNotesEl ? userNotesEl.value.trim() : "";
+
+      const bowModelInput = document.getElementById("bowModel");
+      const bowModelStr = bowModelInput ? bowModelInput.value.trim() : "";
 
       const now = new Date();
       const timestampStr = now.toLocaleString();
@@ -2021,12 +2087,12 @@
             formatNumber(shaftWeightGr, 1) +
             " gr (" +
             formatNumber(shaftPct, 1) +
-            " %)<br>" +
+            " %); " +
             "Point system: " +
             formatNumber(pointSystemWeightGr, 1) +
             " gr (" +
             formatNumber(pointPct, 1) +
-            " %)<br>" +
+            " %); " +
             "Nock / wrap / vanes + glue: " +
             formatNumber(fletchingSystemWeightGr, 1) +
             " gr (" +
@@ -2059,6 +2125,7 @@
         rows.push(["Arrow", "Arrow length", "Input", formatNumber(arrowLengthIn, 2), "in"]);
 
         // Bow
+        rows.push(["Bow", "Bow model & year", "Input", bowModelStr || "—", ""]);
         rows.push(["Bow", "Draw weight", "Input", formatNumber(bowDrawWeightLb, 1), "lb"]);
         rows.push(["Bow", "Draw length", "Input", formatNumber(bowDrawLengthIn, 1), "in"]);
         rows.push(["Bow", "Launch speed estimate", "Input", formatNumber(launchFps, 0), "fps"]);
@@ -2213,6 +2280,11 @@
       });
     }
 
+    const bowModelInput = document.getElementById("bowModel");
+    if (bowModelInput) {
+      bowModelInput.addEventListener("input", calculateAndUpdate);
+    }
+
     const notesEl = document.getElementById("userNotes");
     if (notesEl) {
       notesEl.addEventListener("input", calculateAndUpdate);
@@ -2245,7 +2317,7 @@
     }
 
     const resultsHelpToggle = document.getElementById("resultsHelpToggle");
-    theResultsHelpPanel = document.getElementById("resultsHelpPanel");
+    const theResultsHelpPanel = document.getElementById("resultsHelpPanel");
 
     if (resultsHelpToggle && theResultsHelpPanel) {
       resultsHelpToggle.addEventListener("click", () => {
@@ -2266,10 +2338,201 @@
       syncVisibility();
     }
 
+    // --- CSV helpers ---
+
+    function escapeCsvValue(val) {
+      if (val == null) return "";
+      val = String(val);
+      if (/[",\n]/.test(val)) {
+        return '"' + val.replace(/"/g, '""') + '"';
+      }
+      return val;
+    }
+
+    function tableToCsv() {
+      const table = document.querySelector(".data-table");
+      if (!table) return "";
+
+      const rows = [];
+      const headerCells = table.querySelectorAll("thead th");
+      const headerVals = Array.from(headerCells).map((th) =>
+        th.textContent.trim()
+      );
+      rows.push(headerVals.map(escapeCsvValue).join(","));
+
+      const bodyRows = table.querySelectorAll("tbody tr");
+      bodyRows.forEach((tr) => {
+        const cells = tr.querySelectorAll("td");
+        const vals = Array.from(cells).map((td) =>
+          escapeCsvValue(td.textContent.trim())
+        );
+        rows.push(vals.join(","));
+      });
+
+      return rows.join("\n");
+    }
+
+    function downloadCsvFile(filename, text) {
+      const blob = new Blob([text], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function parseCsvLine(line) {
+      const result = [];
+      let current = "";
+      let inQuotes = false;
+
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+
+        if (ch === '"') {
+          if (inQuotes && line[i + 1] === '"') {
+            current += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (ch === "," && !inQuotes) {
+          result.push(current);
+          current = "";
+        } else {
+          current += ch;
+        }
+      }
+      result.push(current);
+      return result;
+    }
+
+    function applyCsvToInputs(csvText) {
+      const lines = csvText.split(/\r?\n/).filter((l) => l.trim() !== "");
+      if (lines.length < 2) return;
+
+      const header = parseCsvLine(lines[0]);
+      const idxCategory = header.indexOf("Category");
+      const idxField = header.indexOf("Field");
+      const idxValue = header.indexOf("Value");
+
+      if (idxCategory === -1 || idxField === -1 || idxValue === -1) {
+        console.warn("CSV header does not match expected format.");
+        return;
+      }
+
+      const mapping = {
+        "Bow|Draw weight": "bowDrawWeightLb",
+        "Bow|Draw length": "bowDrawLengthIn",
+        "Bow|Launch speed estimate": "launchFps",
+        "Bow|Speed loss / 10 yd": "fpsLossPer10Yards",
+        "Bow|Bow model & year": "bowModel",
+        "Arrow|Name": "arrowName",
+        "Arrow|Spine": "arrowSpine",
+        "Arrow|Arrow length": "arrowLengthIn",
+        "Distances|Distance 1": "dist1Yards",
+        "Distances|Distance 2": "dist2Yards",
+        "Distances|Arc range (visual)": "trajMaxDistanceYards",
+        "Components|Bare shaft weight": "bareShaftWeightGr",
+        "Components|Nock weight": "nockWeightGr",
+        "Components|Wrap weight": "wrapWeightGr",
+        "Components|Vane count": "vaneCount",
+        "Components|Vane weight each": "vaneWeightGr",
+        "Components|Insert / outsert": "insertWeightGr",
+        "Components|Point weight": "pointWeightGr",
+        "Components|Glue weight (est.)": "glueWeightGr",
+        "Calculated|Total arrow weight": "totalArrowWeightGrInput",
+        "Balance|Balance point from nock": "balancePointIn",
+        "Notes|Notes": "userNotes",
+      };
+
+      for (let i = 1; i < lines.length; i++) {
+        const row = parseCsvLine(lines[i]);
+        if (row.length < header.length) continue;
+
+        const category = row[idxCategory].trim();
+        const field = row[idxField].trim();
+        let value = row[idxValue];
+
+        const key = category + "|" + field;
+        const elementId = mapping[key];
+        if (!elementId) continue;
+
+        const el = document.getElementById(elementId);
+        if (!el) continue;
+
+        if (el.tagName === "INPUT") {
+          if (el.type === "number") {
+            const numeric = parseFloat(value);
+            el.value = isNaN(numeric) ? "" : numeric;
+          } else {
+            el.value = value;
+          }
+        } else if (el.tagName === "TEXTAREA") {
+          el.value = value;
+        }
+      }
+
+      updateArrowNameDisplay();
+      calculateAndUpdate();
+    }
+
+    function initCsvButtons() {
+      const copyBtn = document.getElementById("copyCsvBtn");
+      const downloadBtn = document.getElementById("downloadCsvBtn");
+      const uploadInput = document.getElementById("uploadInputsCsv");
+
+      if (copyBtn) {
+        copyBtn.addEventListener("click", async () => {
+          const csv = tableToCsv();
+          if (!csv) return;
+          try {
+            await navigator.clipboard.writeText(csv);
+            copyBtn.textContent = "Copied!";
+            setTimeout(() => {
+              copyBtn.innerHTML = '<span>📋</span><span>Copy table CSV</span>';
+            }, 1200);
+          } catch (e) {
+            console.error("Clipboard write failed:", e);
+            alert("Could not copy CSV to clipboard.");
+          }
+        });
+      }
+
+      if (downloadBtn) {
+        downloadBtn.addEventListener("click", () => {
+          const csv = tableToCsv();
+          if (!csv) return;
+          downloadCsvFile("arrow-tune-data.csv", csv);
+        });
+      }
+
+      if (uploadInput) {
+        uploadInput.addEventListener("change", (e) => {
+          const file = e.target.files && e.target.files[0];
+          if (!file) return;
+
+          const reader = new FileReader();
+          reader.onload = (evt) => {
+            const text = evt.target?.result;
+            if (typeof text === "string") {
+              applyCsvToInputs(text);
+            }
+          };
+          reader.readAsText(file);
+          e.target.value = "";
+        });
+      }
+    }
+
     updateArrowNameDisplay();
     initTheme();
     initInfoPanels();
     calculateAndUpdate();
+    initCsvButtons();
   </script>
 </body>
 </html>
