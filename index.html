@@ -494,13 +494,13 @@
     </div>
 
     <div class="meta">
-      <span id="appVersion">v0.9.4</span>
+      <span id="appVersion">v0.9.5</span>
       <span>•</span>
       <span id="buildDateText">Build date: 2025-11-23</span>
     </div>
 
     <div class="grid">
-      <!-- LEFT: INPUTS -->
+      <!-- LEFT: INPUTS + NOTES -->
       <div>
         <!-- Bow -->
         <div class="card">
@@ -725,9 +725,29 @@
             Measure from the nock throat to the balance point of the finished arrow.
           </div>
         </div>
+
+        <!-- Notes (moved to left column) -->
+        <div class="card">
+          <h2>Notes</h2>
+          <div class="card-subtitle">
+            Freeform notes for this build — tuning details, hunts, broadheads used, and anything else you want to remember.
+          </div>
+          <div class="field">
+            <label
+              for="userNotes"
+              title="Any notes about this arrow, bow, tuning, or hunt. Not saved permanently yet."
+            >
+              Notes for this arrow setup
+            </label>
+            <textarea id="userNotes" placeholder="Example: Broadhead tune at 30 yards, used on elk hunt, etc."></textarea>
+          </div>
+          <div class="note">
+            Notes stay in this browser tab only for now. Future versions may allow saving multiple arrows.
+          </div>
+        </div>
       </div>
 
-      <!-- RIGHT: RESULTS & VISUAL -->
+      <!-- RIGHT: RESULTS & VISUALS -->
       <div>
         <!-- Core results -->
         <div class="card">
@@ -1096,26 +1116,6 @@
               </thead>
               <tbody id="summaryTableBody"></tbody>
             </table>
-          </div>
-        </div>
-
-        <!-- Notes -->
-        <div class="card">
-          <h2>Notes</h2>
-          <div class="card-subtitle">
-            Freeform notes for this build — tuning details, hunts, broadheads used, and anything else you want to remember.
-          </div>
-          <div class="field">
-            <label
-              for="userNotes"
-              title="Any notes about this arrow, bow, tuning, or hunt. Not saved permanently yet."
-            >
-              Notes for this arrow setup
-            </label>
-            <textarea id="userNotes" placeholder="Example: Broadhead tune at 30 yards, used on elk hunt, etc."></textarea>
-          </div>
-          <div class="note">
-            Notes stay in this browser tab only for now. Future versions may allow saving multiple arrows.
           </div>
         </div>
 
