@@ -118,16 +118,68 @@
         color 0.35s ease;
     }
 
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
     .card h2 {
       font-size: 1rem;
-      margin: 0 0 6px 0;
+      margin: 0;
       color: var(--text);
     }
 
-    .card .card-subtitle {
+    .card-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    .info-btn {
+      border-radius: 999px;
+      border: 1px solid var(--border-soft);
+      background: var(--bg-elevated);
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      width: 18px;
+      height: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+      transition:
+        background-color 0.25s ease,
+        border-color 0.25s ease,
+        color 0.25s ease;
+    }
+
+    .info-btn:hover {
+      border-color: #3b82f6;
+      color: #bfdbfe;
+    }
+
+    .info-panel {
+      display: none;
+      margin-bottom: 8px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 1px dashed var(--border-soft);
+      background: var(--bg-elevated);
       font-size: 0.75rem;
       color: var(--text-muted);
-      margin-bottom: 8px;
+      transition:
+        background-color 0.35s ease,
+        border-color 0.35s ease,
+        color 0.35s ease;
+    }
+
+    .info-panel p {
+      margin: 2px 0;
     }
 
     .field {
@@ -448,7 +500,7 @@
       margin-top: 4px;
       font-size: 0.75rem;
       color: var(--text-muted);
-      text-align:全面 center;
+      text-align: center;
     }
 
     .traj-label {
@@ -579,10 +631,20 @@
       <div>
         <!-- Bow -->
         <div class="card">
-          <h2>Bow</h2>
-          <div class="card-subtitle">
-            Basic bow setup so we can relate arrow weight to draw weight and estimate speed and momentum.
+          <div class="card-header">
+            <h2>Bow</h2>
+            <button
+              class="info-btn"
+              data-info-target="bowInfo"
+              title="Show information about this section"
+            >
+              i
+            </button>
           </div>
+          <div id="bowInfo" class="info-panel">
+            <p>Basic bow setup so we can relate arrow weight to draw weight and estimate speed and momentum.</p>
+          </div>
+
           <div class="field-row">
             <div class="field">
               <label
@@ -640,10 +702,20 @@
 
         <!-- Arrow Info -->
         <div class="card">
-          <h2>Arrow Info</h2>
-          <div class="card-subtitle">
-            High-level info so you can label and compare different arrow builds.
+          <div class="card-header">
+            <h2>Arrow Info</h2>
+            <button
+              class="info-btn"
+              data-info-target="arrowInfo"
+              title="Show information about this section"
+            >
+              i
+            </button>
           </div>
+          <div id="arrowInfo" class="info-panel">
+            <p>High-level info so you can label and compare different arrow builds.</p>
+          </div>
+
           <div class="field">
             <label
               for="arrowName"
@@ -675,10 +747,21 @@
 
         <!-- Arrow Shaft & Total Weight -->
         <div class="card">
-          <h2>Arrow Shaft & Total Weight</h2>
-          <div class="card-subtitle">
-            Arrow length and the finished total arrow weight from your scale. Component details are optional.
+          <div class="card-header">
+            <h2>Arrow Shaft &amp; Total Weight</h2>
+            <button
+              class="info-btn"
+              data-info-target="shaftInfo"
+              title="Show information about this section"
+            >
+              i
+            </button>
           </div>
+          <div id="shaftInfo" class="info-panel">
+            <p>Arrow length and the finished total arrow weight from your scale. Component details are optional.</p>
+            <p>Most people only need arrow length, total arrow weight, and balance point. If you enter a full component breakdown in the advanced section, that total will be used instead of this field.</p>
+          </div>
+
           <div class="field-row">
             <div class="field">
               <label
@@ -704,20 +787,23 @@
               />
             </div>
           </div>
-          <div class="note">
-            Most people only need arrow length, total arrow weight, and balance point. If you enter a full component breakdown in the advanced section, that total will be used instead of this field.
-          </div>
         </div>
 
         <!-- Components (Advanced) -->
         <div class="card">
-          <h2>Components (Advanced)</h2>
-          <div class="card-subtitle">
-            Detailed component weights, including bare shaft, are only needed if you track each part with a small scale.
+          <div class="card-header">
+            <h2>Components (Advanced)</h2>
+            <button
+              class="info-btn"
+              data-info-target="componentsInfo"
+              title="Show information about this section"
+            >
+              i
+            </button>
           </div>
-
-          <div class="note">
-            If you complete all the main component fields (bare shaft, nock, vanes, insert, point), the calculator will use their sum as the total arrow weight. Otherwise, it will use the total arrow weight field above.
+          <div id="componentsInfo" class="info-panel">
+            <p>Detailed component weights, including bare shaft, are only needed if you track each part with a small scale.</p>
+            <p>If you complete all the main component fields (bare shaft, nock, vanes, insert, point), the calculator will use their sum as the total arrow weight. Otherwise, it will use the total arrow weight field above.</p>
           </div>
 
           <div class="field" style="margin-top:6px;">
@@ -815,10 +901,21 @@
 
         <!-- Balance Point -->
         <div class="card">
-          <h2>Balance Point</h2>
-          <div class="card-subtitle">
-            Where the finished arrow actually balances, which drives FOC and front/back weight bias.
+          <div class="card-header">
+            <h2>Balance Point</h2>
+            <button
+              class="info-btn"
+              data-info-target="balanceInfo"
+              title="Show information about this section"
+            >
+              i
+            </button>
           </div>
+          <div id="balanceInfo" class="info-panel">
+            <p>Where the finished arrow actually balances, which drives FOC and front/back weight bias.</p>
+            <p>Measure from the nock throat to the balance point of the finished arrow.</p>
+          </div>
+
           <div class="field">
             <label
               for="balancePointIn"
@@ -828,17 +925,25 @@
             </label>
             <input id="balancePointIn" type="number" value="18.5" step="0.01" />
           </div>
-          <div class="note">
-            Measure from the nock throat to the balance point of the finished arrow.
-          </div>
         </div>
 
         <!-- Notes -->
         <div class="card">
-          <h2>Notes</h2>
-          <div class="card-subtitle">
-            Freeform notes for this build — tuning details, hunts, broadheads used, and anything else you want to remember.
+          <div class="card-header">
+            <h2>Notes</h2>
+            <button
+              class="info-btn"
+              data-info-target="notesInfo"
+              title="Show information about this section"
+            >
+              i
+            </button>
           </div>
+          <div id="notesInfo" class="info-panel">
+            <p>Freeform notes for this build — tuning details, hunts, broadheads used, and anything else you want to remember.</p>
+            <p>Notes stay in this browser tab only for now. Future versions may allow saving multiple arrows.</p>
+          </div>
+
           <div class="field">
             <label
               for="userNotes"
@@ -848,9 +953,6 @@
             </label>
             <textarea id="userNotes" placeholder="Example: Broadhead tune at 30 yards, used on elk hunt, etc."></textarea>
           </div>
-          <div class="note">
-            Notes stay in this browser tab only for now. Future versions may allow saving multiple arrows.
-          </div>
         </div>
       </div>
 
@@ -858,9 +960,18 @@
       <div>
         <!-- Core results -->
         <div class="card">
-          <h2>Results</h2>
-          <div class="card-subtitle">
-            Big-picture summary of your arrow build: total weight, FOC, grains per pound, and grains per inch.
+          <div class="card-header">
+            <h2>Results</h2>
+            <button
+              class="info-btn"
+              data-info-target="resultsInfo"
+              title="Show information about this section"
+            >
+              i
+            </button>
+          </div>
+          <div id="resultsInfo" class="info-panel">
+            <p>Big-picture summary of your arrow build: total weight, FOC, grains per pound, and grains per inch.</p>
           </div>
 
           <div class="results-row">
@@ -958,9 +1069,18 @@
 
         <!-- Kinetics: FPS, Momentum & Trajectory -->
         <div class="card">
-          <h2>Kinetics (FPS, Momentum & Trajectory)</h2>
-          <div class="card-subtitle">
-            How hard and how fast the arrow is moving at the bow and downrange, plus a simplified flight arc.
+          <div class="card-header">
+            <h2>Kinetics (FPS, Momentum &amp; Trajectory)</h2>
+            <button
+              class="info-btn"
+              data-info-target="kineticsInfo"
+              title="Show information about this section"
+            >
+              i
+            </button>
+          </div>
+          <div id="kineticsInfo" class="info-panel">
+            <p>How hard and how fast the arrow is moving at the bow and downrange, plus a simplified flight arc.</p>
           </div>
 
           <div class="results-row">
@@ -1143,9 +1263,18 @@
 
         <!-- FOC & weight visuals -->
         <div class="card">
-          <h2>FOC & Weight Distribution</h2>
-          <div class="card-subtitle">
-            Visuals that show how weight is spread along the arrow and how far forward the balance point sits.
+          <div class="card-header">
+            <h2>FOC &amp; Weight Distribution</h2>
+            <button
+              class="info-btn"
+              data-info-target="focInfo"
+              title="Show information about this section"
+            >
+              i
+            </button>
+          </div>
+          <div id="focInfo" class="info-panel">
+            <p>Visuals that show how weight is spread along the arrow and how far forward the balance point sits.</p>
           </div>
 
           <!-- 1) Arrow balance along length (above FOC gauge) -->
@@ -1213,10 +1342,20 @@
 
         <!-- Data Table -->
         <div class="card">
-          <h2>Data Table (Inputs & Calculated)</h2>
-          <div class="card-subtitle">
-            Spreadsheet-style view of what you entered and what the calculator derived from it, with source labels.
+          <div class="card-header">
+            <h2>Data Table (Inputs &amp; Calculated)</h2>
+            <button
+              class="info-btn"
+              data-info-target="dataTableInfo"
+              title="Show information about this section"
+            >
+              i
+            </button>
           </div>
+          <div id="dataTableInfo" class="info-panel">
+            <p>Spreadsheet-style view of what you entered and what the calculator derived from it, with source labels.</p>
+          </div>
+
           <div class="data-table-wrapper">
             <table class="data-table">
               <thead>
@@ -1466,7 +1605,6 @@
       const componentTotal =
         shaftWeightGr + pointSystemWeightGr + fletchingSystemWeightGr;
 
-      // Detect whether the component breakdown is "complete enough" to trust as total.
       const componentComplete =
         shaftWeightGr > 0 &&
         nockWeightGr > 0 &&
@@ -1474,21 +1612,17 @@
         vaneWeightGr > 0 &&
         insertWeightGr > 0 &&
         pointWeightGr > 0;
-      // wrapWeightGr and glueWeightGr may be zero and still considered complete.
 
       let totalArrowWeightGr = 0;
       let totalSource = "None";
 
       if (componentComplete && componentTotal > 0) {
-        // Use full component sum if the user has entered a complete breakdown.
         totalArrowWeightGr = componentTotal;
         totalSource = "Calculated (full components)";
       } else if (totalArrowWeightGrInput > 0) {
-        // Otherwise, fall back to the total arrow weight field.
         totalArrowWeightGr = totalArrowWeightGrInput;
         totalSource = "Input (total field)";
       } else if (componentTotal > 0) {
-        // Partial components but no total field — use what we have, but mark as partial.
         totalArrowWeightGr = componentTotal;
         totalSource = "Calculated (partial components)";
       } else {
@@ -1925,6 +2059,22 @@
       }
     }
 
+    function initInfoPanels() {
+      const buttons = document.querySelectorAll(".info-btn");
+      buttons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const targetId = btn.getAttribute("data-info-target");
+          if (!targetId) return;
+          const panel = document.getElementById(targetId);
+          if (!panel) return;
+          const isHidden =
+            panel.style.display === "none" ||
+            panel.style.display === "";
+          panel.style.display = isHidden ? "block" : "none";
+        });
+      });
+    }
+
     const inputIds = [
       "bowDrawWeightLb",
       "bowDrawLengthIn",
@@ -2017,6 +2167,7 @@
 
     updateArrowNameDisplay();
     initTheme();
+    initInfoPanels();
     calculateAndUpdate();
   </script>
 </body>
