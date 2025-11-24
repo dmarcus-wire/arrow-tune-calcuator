@@ -227,10 +227,21 @@
       border: 1px solid #111827;
       background: #020617;
       display: flex;
+      position: relative;
     }
     .weight-shaft { background: #1d4ed8; }
     .weight-point { background: #ea580c; }
     .weight-fletch { background: #a855f7; }
+
+    .weight-mid-line {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 2px;
+      background: #111827;
+      pointer-events: none;
+    }
 
     .weight-legend {
       display: flex;
@@ -266,6 +277,17 @@
       background: #020617;
       border: 1px solid #111827;
       overflow: hidden;
+    }
+
+    /* Recommended FOC band (~10–18% forward of center) */
+    .foc-shift-band {
+      position: absolute;
+      top: 0;
+      height: 100%;
+      left: 75%;          /* approx 10% forward of center when MAX_RANGE = 20 */
+      width: 20%;         /* covers to ~18–20% forward */
+      background: rgba(34, 197, 94, 0.16);
+      pointer-events: none;
     }
 
     .foc-shift-zero {
@@ -306,6 +328,12 @@
       font-size: 0.75rem;
       color: #6b7280;
       margin-top: 6px;
+    }
+
+    .note-strong {
+      color: #e5e7eb;
+      font-size: 0.8rem;
+      margin-top: 4px;
     }
 
     .footer {
@@ -377,7 +405,30 @@
       background: #020617;
       font-size: 0.7rem;
       color: #e5e7eb;
-      cursor: help;
+      cursor: pointer;
+    }
+
+    .help-badge:hover {
+      border-color: #3b82f6;
+    }
+
+    .help-panel {
+      margin-top: 4px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 1px solid #111827;
+      background: #020617;
+      font-size: 0.75rem;
+      color: #9ca3af;
+    }
+
+    .help-panel ul {
+      margin: 4px 0 0 16px;
+      padding: 0;
+    }
+
+    .help-panel li {
+      margin: 2px 0;
     }
   </style>
 </head>
@@ -389,7 +440,7 @@
     </div>
 
     <div class="meta">
-      <span id="appVersion">v0.8.4</span>
+      <span id="appVersion">v0.8.7</span>
       <span>•</span>
       <span id="buildDateText">Build date: 2025-11-23</span>
     </div>
@@ -683,7 +734,7 @@
                   value="60"
                   step="1"
                   style="width: 3rem; background:#020617; color:#e5e7eb; border:1px solid #1f2937; border-radius:4px; padding:2px 4px; font-size:0.75rem;"
-                  title="Distance in yards for the second FPS/momentum estimate."
+                  title="Distance in yards for the second FPS/momentum estimate. Arc range will try to keep this in sync."
                 /> yd)
               </span>
             </span>
@@ -691,7 +742,7 @@
           </div>
 
           <div class="results-row">
-            <span class="label">Game momentum band</span>
+            <span class="label">Game momentum band (farthest distance)</span>
             <span class="value">
               <span id="momentumBandLabel" class="momentum-band-text">–</span>
             </span>
@@ -704,11 +755,42 @@
 
           <div class="note">
             <span
+              id="bandsHelpToggle"
               class="help-badge"
-              title="These bands are rough rules of thumb based on arrow momentum and penetration studies (such as Dr. Ed Ashby’s work) and common kinetic-energy charts from major arrow manufacturers. Small–medium game often falls around ~0.25–0.35 slug·ft/s, deer-sized game around ~0.30–0.45, large game like elk or black bear around ~0.45–0.60+, and very large or dangerous game 0.60+ slug·ft/s. These are NOT guarantees of lethality—shot placement, broadhead quality, and local regulations matter most."
+              title="Click to expand a short explanation of how these bands are commonly used."
             >
               Learn more about these bands
             </span>
+          </div>
+
+          <div
+            id="bandsHelpPanel"
+            class="help-panel"
+            style="display: none;"
+          >
+            <div class="note-strong">
+              These bands are rules of thumb — not guarantees.
+            </div>
+            <p style="margin:4px 0;">
+              They come from:
+            </p>
+            <ul>
+              <li>Arrow penetration studies that focus on <strong>momentum</strong> (like Dr. Ed Ashby’s work).</li>
+              <li>Common <strong>kinetic energy charts</strong> published by arrow and broadhead manufacturers.</li>
+            </ul>
+            <p style="margin:4px 0;">
+              Typical interpretations:
+            </p>
+            <ul>
+              <li><strong>~0.25–0.35 slug·ft/s</strong>: small game, turkey.</li>
+              <li><strong>~0.30–0.45 slug·ft/s</strong>: deer-sized game (whitetail, pronghorn).</li>
+              <li><strong>~0.45–0.60+ slug·ft/s</strong>: larger game like elk or black bear.</li>
+              <li><strong>0.60+ slug·ft/s</strong>: very large or dangerous game.</li>
+            </ul>
+            <p style="margin:4px 0;">
+              They assume sharp, well-built broadheads and legal setups.
+              <strong>Shot placement, arrow flight, and local regulations matter more than any single number.</strong>
+            </p>
           </div>
 
           <!-- Trajectory arc visualization -->
@@ -723,7 +805,7 @@
                 value="80"
                 step="5"
                 style="width: 3.5rem; background:#020617; color:#e5e7eb; border:1px solid #1f2937; border-radius:4px; padding:2px 4px; font-size:0.75rem;"
-                title="Maximum distance (yards) for the displayed arc."
+                title="Maximum distance (yards) for the displayed arc. Distance 2 will follow this when you change it."
               /> yd (visual only)
             </div>
 
@@ -804,6 +886,8 @@
           <div class="viz-block foc-shift-visual">
             <div class="viz-title">FOC Shift Gauge</div>
             <div class="foc-shift-track">
+              <!-- Recommended FOC band (~10–18% forward of center) -->
+              <div class="foc-shift-band"></div>
               <div class="foc-shift-zero"></div>
               <div id="focShiftMarker" class="foc-shift-marker"></div>
             </div>
@@ -813,6 +897,9 @@
             </div>
             <div class="foc-shift-details" id="focShiftDetails">
               FOC shift: –
+            </div>
+            <div class="note" style="margin-top:4px;">
+              Shaded zone ≈ common bowhunting FOC range (~10–18% forward of center).
             </div>
           </div>
 
@@ -837,6 +924,7 @@
           <div class="viz-block weight-visual">
             <div class="viz-title">Weight Composition</div>
             <div class="weight-bar">
+              <div class="weight-mid-line"></div>
               <div id="weightShaft" class="weight-shaft"></div>
               <div id="weightPoint" class="weight-point"></div>
               <div id="weightFletch" class="weight-fletch"></div>
@@ -845,6 +933,9 @@
               <span><span class="dot" style="background:#1d4ed8;"></span> Shaft</span>
               <span><span class="dot" style="background:#ea580c;"></span> Point system</span>
               <span><span class="dot" style="background:#a855f7;"></span> Nock / wrap / vanes + glue</span>
+            </div>
+            <div class="note">
+              Center line shows the halfway mark: if the blue shaft segment crosses it, more than half of total arrow weight is in the shaft.
             </div>
           </div>
         </div>
@@ -917,7 +1008,7 @@
       return (arrowWeightGrains * fps) / 225400;
     }
 
-    // Classify launch momentum into a rough game band.
+    // Classify momentum into a rough game band.
     function classifyMomentumBand(momentum) {
       if (!isFinite(momentum) || momentum <= 0) return null;
 
@@ -1090,6 +1181,9 @@
       const dist2Yards = readNumber("dist2Yards");
       const trajMaxDistanceYards = readNumber("trajMaxDistanceYards");
 
+      // Arc range (visual). Use a small fallback if 0.
+      let arcRangeYards = trajMaxDistanceYards > 0 ? trajMaxDistanceYards : 10;
+
       // Arrow geometry
       const arrowLengthIn = readNumber("arrowLengthIn");
       const bareShaftWeightGr = readNumber("bareShaftWeightGr");
@@ -1258,25 +1352,38 @@
         dist2KineticsDisplay.textContent = fpsText + " / " + momText;
       }
 
-      // Momentum band badge based on launch momentum
+      // Game momentum band based on farthest distance (dist1, dist2, arc)
       if (momentumBandLabel) {
-        const bandName = classifyMomentumBand(launchMomentum);
-        if (!bandName) {
+        const farthestDist = Math.max(dist1Yards, dist2Yards, arcRangeYards);
+        if (!isFinite(farthestDist) || farthestDist <= 0) {
           momentumBandLabel.textContent = "–";
         } else {
-          momentumBandLabel.textContent =
-            "Your setup: " +
-            formatNumber(launchMomentum, 3) +
-            " slug·ft/s → in the '" +
-            bandName +
-            "' band.";
+          const fpsFar = estimateFpsAtDistance(
+            launchFpsUsed,
+            fpsLossPer10Yards,
+            farthestDist
+          );
+          const momentumFar = computeMomentumSlugFtPerSec(
+            totalArrowWeightGr,
+            fpsFar
+          );
+          const bandName = classifyMomentumBand(momentumFar);
+          if (!bandName || !isFinite(momentumFar) || momentumFar <= 0) {
+            momentumBandLabel.textContent = "–";
+          } else {
+            momentumBandLabel.textContent =
+              "At ~" +
+              Math.round(farthestDist) +
+              " yd: " +
+              formatNumber(momentumFar, 3) +
+              " slug·ft/s → in the '" +
+              bandName +
+              "' band.";
+          }
         }
       }
 
-      // Trajectory arc: use ONLY the user arc range (with small fallback)
-      const arcRangeYards = trajMaxDistanceYards > 0 ? trajMaxDistanceYards : 10;
-
-      // Impact momentum at the arc's max distance
+      // Trajectory arc: impact momentum at the arc's max distance
       const fpsImpact = estimateFpsAtDistance(
         launchFpsUsed,
         fpsLossPer10Yards,
@@ -1411,6 +1518,32 @@
     if (arrowNameInput) {
       arrowNameInput.addEventListener("input", () => {
         updateArrowNameDisplay();
+      });
+    }
+
+    // Keep Distance 2 loosely connected to Arc range: when arc changes, update dist2
+    const trajInput = document.getElementById("trajMaxDistanceYards");
+    const dist2Input = document.getElementById("dist2Yards");
+    if (trajInput && dist2Input) {
+      // Initial sync on load
+      dist2Input.value = trajInput.value;
+
+      trajInput.addEventListener("input", () => {
+        const v = readNumber("trajMaxDistanceYards");
+        dist2Input.value = v > 0 ? v : "";
+        calculateAndUpdate();
+      });
+    }
+
+    // Help panel toggle
+    const bandsHelpToggle = document.getElementById("bandsHelpToggle");
+    const bandsHelpPanel = document.getElementById("bandsHelpPanel");
+    if (bandsHelpToggle && bandsHelpPanel) {
+      bandsHelpToggle.addEventListener("click", () => {
+        const isHidden =
+          bandsHelpPanel.style.display === "none" ||
+          bandsHelpPanel.style.display === "";
+        bandsHelpPanel.style.display = isHidden ? "block" : "none";
       });
     }
 
