@@ -154,6 +154,11 @@
     .foc-normal { background: #064e3b; color: #bbf7d0; }
     .foc-high { background: #7f1d1d; color: #fecaca; }
 
+    /* GPP tags */
+    .gpp-low { background: #7f1d1d; color: #fecaca; }
+    .gpp-normal { background: #064e3b; color: #bbf7d0; }
+    .gpp-high { background: #1e3a8a; color: #bfdbfe; }
+
     /* Arrow balance bar */
     .arrow-visual {
       margin-top: 4px;
@@ -440,7 +445,7 @@
     </div>
 
     <div class="meta">
-      <span id="appVersion">v0.8.8</span>
+      <span id="appVersion">v0.8.9</span>
       <span>•</span>
       <span id="buildDateText">Build date: 2025-11-23</span>
     </div>
@@ -685,7 +690,10 @@
             <span class="value" id="focPercent">–</span>
           </div>
           <div class="results-row">
-            <span class="label">Grains per pound (GPP)</span>
+            <span class="label">
+              Grains per pound (GPP)
+              <span id="gppTag" class="foc-tag gpp-normal" style="display:none;"></span>
+            </span>
             <span class="value" id="grainsPerPound">–</span>
           </div>
           <div class="results-row">
@@ -916,7 +924,7 @@
               <div id="balanceMarker" class="arrow-balance-marker"></div>
             </div>
             <div class="arrow-legend">
-              Green line = geometric center, orange marker = balance point.
+              Green line = geometric center, orange marker = balance point (driven by FOC).
             </div>
           </div>
 
@@ -1294,6 +1302,29 @@
             text = "High";
           }
           focTag.textContent = text;
+        }
+      }
+
+      // GPP tag
+      const gppTag = document.getElementById("gppTag");
+      if (gppTag) {
+        const gpp = grainsPerPound;
+        gppTag.style.display = isFinite(gpp) ? "inline-block" : "none";
+        if (isFinite(gpp)) {
+          gppTag.classList.remove("gpp-low", "gpp-normal", "gpp-high");
+
+          let text = "";
+          if (gpp < 5.3) {
+            gppTag.classList.add("gpp-low");
+            text = "Light";
+          } else if (gpp <= 6.3) {
+            gppTag.classList.add("gpp-normal");
+            text = "Typical hunting";
+          } else {
+            gppTag.classList.add("gpp-high");
+            text = "Heavy";
+          }
+          gppTag.textContent = text;
         }
       }
 
