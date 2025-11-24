@@ -159,6 +159,12 @@
     .gpp-normal { background: #064e3b; color: #bbf7d0; }
     .gpp-high { background: #1e3a8a; color: #bfdbfe; }
 
+    /* GPI (full arrow) tags */
+    .gpi-light { background: #7f1d1d; color: #fecaca; }
+    .gpi-normal { background: #064e3b; color: #bbf7d0; }
+    .gpi-heavy { background: #1e3a8a; color: #bfdbfe; }
+    .gpi-ultra { background: #4c1d95; color: #e9d5ff; }
+
     /* Arrow balance bar */
     .arrow-visual {
       margin-top: 4px;
@@ -289,8 +295,8 @@
       position: absolute;
       top: 0;
       height: 100%;
-      left: 75%;          /* approx 10% forward of center when MAX_RANGE = 20 */
-      width: 20%;         /* covers to ~18–20% forward */
+      left: 75%;
+      width: 20%;
       background: rgba(34, 197, 94, 0.16);
       pointer-events: none;
     }
@@ -445,7 +451,7 @@
     </div>
 
     <div class="meta">
-      <span id="appVersion">v0.8.9</span>
+      <span id="appVersion">v0.9.0</span>
       <span>•</span>
       <span id="buildDateText">Build date: 2025-11-23</span>
     </div>
@@ -701,7 +707,10 @@
             <span class="value" id="shaftGpi">–</span>
           </div>
           <div class="results-row">
-            <span class="label">Arrow GPI (full arrow)</span>
+            <span class="label">
+              Arrow GPI (full arrow)
+              <span id="gpiTag" class="foc-tag gpi-normal" style="display:none;"></span>
+            </span>
             <span class="value" id="arrowGpi">–</span>
           </div>
         </div>
@@ -1325,6 +1334,31 @@
             text = "Heavy";
           }
           gppTag.textContent = text;
+        }
+      }
+
+      // GPI (full arrow) tag
+      const gpiTag = document.getElementById("gpiTag");
+      if (gpiTag) {
+        const gpi = arrowGpi;
+        gpiTag.style.display = isFinite(gpi) ? "inline-block" : "none";
+        if (isFinite(gpi)) {
+          gpiTag.classList.remove("gpi-light", "gpi-normal", "gpi-heavy", "gpi-ultra");
+          let text = "";
+          if (gpi < 9.0) {
+            gpiTag.classList.add("gpi-light");
+            text = "Light";
+          } else if (gpi <= 11.0) {
+            gpiTag.classList.add("gpi-normal");
+            text = "Typical hunting";
+          } else if (gpi <= 13.0) {
+            gpiTag.classList.add("gpi-heavy");
+            text = "Heavy";
+          } else {
+            gpiTag.classList.add("gpi-ultra");
+            text = "Ultra-heavy";
+          }
+          gpiTag.textContent = text;
         }
       }
 

@@ -56,6 +56,7 @@ Future Improvements (optional ideas)
 ## Phase 2 — Data Saving & Power Features
 
 ### Local Storage & Shooter Profiles
+- [ ] Print a table at the bottom similar to a CSV printout
 - [ ] Save arrow builds locally  
 - [ ] Support multiple saved arrow builds  
 - [ ] Support multiple shooters (per shooter profiles)  
@@ -71,9 +72,9 @@ Future Improvements (optional ideas)
   - [x] Right = point end  
   - [x] Show FOC shift (balance point vs geometric center)  
 - [ ] Add FPS drop visualization over distance  
-- [ ] Add arrow trajectory graph  
-  - [ ] User sets max yardage (0–100 yards)  
-  - [ ] Show max height of arc in feet  
+- [x] Add arrow trajectory graph  
+  - [x] User sets max yardage (0–100 yards)  
+  - [x] Show max height of arc in feet  
 - [ ] Add projected kill-effectiveness visualization  
   - [ ] Based on momentum/energy  
   - [ ] Color-coded zones from 0 to 80 yards  
@@ -81,7 +82,6 @@ Future Improvements (optional ideas)
 ---
 
 ## Phase 4 — Long-Term / Expert Features
-- [ ] Add dynamic spine estimation  
 - [ ] Add side-by-side arrow comparison mode  
 - [ ] Add environmental adjustments (wind, temp, bow efficiency)  
 - [ ] Convert to PWA (offline support, installable app)  
