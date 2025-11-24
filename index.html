@@ -25,18 +25,52 @@
   -->
 
   <style>
+    /* ---------------------------
+       THEME VARIABLES
+       --------------------------- */
+
+    :root {
+      /* Dark (default) */
+      --bg: #020617;
+      --bg-card: #020617;
+      --bg-elevated: #020617;
+      --bg-input: #020617;
+      --border: #1f2937;
+      --border-soft: #111827;
+      --text: #e5e7eb;
+      --text-muted: #9ca3af;
+      --axis: #1f2937;
+    }
+
+    /* Light mode with archery/hunting feel (tan/olive/earthy) */
+    .light-mode {
+      --bg: #f5f5f0;           /* warm off-white */
+      --bg-card: #fffaf2;      /* soft parchment */
+      --bg-elevated: #fffbf2;  /* slightly brighter card */
+      --bg-input: #fff7e6;     /* light tan input */
+      --border: #e2ddcf;       /* warm soft border */
+      --border-soft: #d5c8af;  /* slightly darker edge */
+      --text: #1f2933;         /* deep charcoal */
+      --text-muted: #6b7280;   /* neutral muted */
+      --axis: #d0c4aa;         /* light tan axis lines */
+    }
+
     body {
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
         sans-serif;
-      background: #020617;
-      color: #e5e7eb;
+      background: var(--bg);
+      color: var(--text);
+      transition:
+        background-color 0.35s ease,
+        color 0.35s ease;
     }
 
     .page {
       max-width: 900px;
       margin: 0 auto;
       padding: 16px;
+      transition: background-color 0.35s ease;
     }
 
     h1 {
@@ -46,7 +80,7 @@
 
     .subtitle {
       font-size: 0.9rem;
-      color: #9ca3af;
+      color: var(--text-muted);
       margin-bottom: 8px;
     }
 
@@ -73,22 +107,26 @@
     }
 
     .card {
-      background: #020617;
+      background: var(--bg-card);
       border-radius: 12px;
       padding: 12px 14px;
-      border: 1px solid #1f2937;
+      border: 1px solid var(--border);
       margin-bottom: 12px;
+      transition:
+        background-color 0.35s ease,
+        border-color 0.35s ease,
+        color 0.35s ease;
     }
 
     .card h2 {
       font-size: 1rem;
       margin: 0 0 6px 0;
-      color: #e5e7eb;
+      color: var(--text);
     }
 
     .card .card-subtitle {
       font-size: 0.75rem;
-      color: #9ca3af;
+      color: var(--text-muted);
       margin-bottom: 8px;
     }
 
@@ -106,19 +144,23 @@
 
     .field label {
       font-size: 0.8rem;
-      color: #9ca3af;
+      color: var(--text-muted);
       margin-bottom: 2px;
     }
 
     .field input,
     .field textarea {
       border-radius: 6px;
-      border: 1px solid #1f2937;
+      border: 1px solid var(--border);
       padding: 6px 8px;
       font-size: 0.9rem;
-      background: #020617;
-      color: #e5e7eb;
+      background: var(--bg-input);
+      color: var(--text);
       outline: none;
+      transition:
+        background-color 0.35s ease,
+        color 0.35s ease,
+        border-color 0.35s ease;
     }
 
     .field textarea {
@@ -140,12 +182,12 @@
     }
 
     .results-row span.label {
-      color: #9ca3af;
+      color: var(--text-muted);
     }
 
     .results-row span.value {
       font-weight: 600;
-      color: #e5e7eb;
+      color: var(--text);
     }
 
     .foc-tag {
@@ -184,9 +226,12 @@
       height: 14px;
       margin: 0 auto;
       border-radius: 999px;
-      background: #020617;
-      border: 1px solid #111827;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-soft);
       overflow: hidden;
+      transition:
+        background-color 0.35s ease,
+        border-color 0.35s ease;
     }
 
     .arrow-center-line {
@@ -221,7 +266,7 @@
     .arrow-legend {
       margin-top: 4px;
       font-size: 0.75rem;
-      color: #9ca3af;
+      color: var(--text-muted);
     }
 
     .arrow-ends {
@@ -230,7 +275,7 @@
       max-width: 420px;
       margin: 0 auto 2px;
       font-size: 0.75rem;
-      color: #9ca3af;
+      color: var(--text-muted);
     }
 
     /* Weight composition bar */
@@ -241,10 +286,13 @@
       height: 14px;
       border-radius: 999px;
       overflow: hidden;
-      border: 1px solid #111827;
-      background: #020617;
+      border: 1px solid var(--border-soft);
+      background: var(--bg-elevated);
       display: flex;
       position: relative;
+      transition:
+        background-color 0.35s ease,
+        border-color 0.35s ease;
     }
     .weight-shaft { background: #1d4ed8; }
     .weight-point { background: #ea580c; }
@@ -266,7 +314,7 @@
       gap: 12px;
       margin-top: 4px;
       font-size: 0.75rem;
-      color: #9ca3af;
+      color: var(--text-muted);
       flex-wrap: wrap;
     }
 
@@ -291,12 +339,14 @@
       height: 10px;
       margin: 0 auto;
       border-radius: 999px;
-      background: #020617;
-      border: 1px solid #111827;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-soft);
       overflow: hidden;
+      transition:
+        background-color 0.35s ease,
+        border-color 0.35s ease;
     }
 
-    /* Recommended FOC band (~10–18% forward of center) */
     .foc-shift-band {
       position: absolute;
       top: 0;
@@ -332,23 +382,24 @@
       max-width: 420px;
       margin: 3px auto 0;
       font-size: 0.75rem;
-      color: #9ca3af;
+      color: var(--text-muted);
     }
 
     .foc-shift-details {
       margin-top: 4px;
       font-size: 0.8rem;
-      color: #e5e7eb;
+      color: var(--text);
     }
 
     .note {
       font-size: 0.75rem;
       color: #6b7280;
       margin-top: 6px;
+      transition: color 0.35s ease;
     }
 
     .note-strong {
-      color: #e5e7eb;
+      color: var(--text);
       font-size: 0.8rem;
       margin-top: 4px;
     }
@@ -364,14 +415,17 @@
       margin-top: 8px;
       padding: 8px 10px;
       border-radius: 10px;
-      border: 1px solid #111827;
-      background: #020617;
+      border: 1px solid var(--border-soft);
+      background: var(--bg-elevated);
+      transition:
+        background-color 0.35s ease,
+        border-color 0.35s ease;
     }
 
     .viz-title {
       font-size: 0.8rem;
       font-weight: 600;
-      color: #e5e7eb;
+      color: var(--text);
       margin-bottom: 4px;
       text-align: left;
     }
@@ -386,8 +440,9 @@
     }
 
     .traj-axis {
-      stroke: #1f2937;
+      stroke: var(--axis);
       stroke-width: 0.6;
+      transition: stroke 0.35s ease;
     }
 
     #trajGraphLine {
@@ -399,13 +454,14 @@
     .traj-legend {
       margin-top: 4px;
       font-size: 0.75rem;
-      color: #9ca3af;
+      color: var(--text-muted);
       text-align: center;
     }
 
     .traj-label {
-      fill: #6b7280;
+      fill: var(--text-muted);
       font-size: 4px;
+      transition: fill 0.35s ease;
     }
 
     /* Momentum band & help badge */
@@ -418,11 +474,15 @@
       margin-top: 3px;
       padding: 2px 6px;
       border-radius: 999px;
-      border: 1px solid #1f2937;
-      background: #020617;
+      border: 1px solid var(--border-soft);
+      background: var(--bg-elevated);
       font-size: 0.7rem;
-      color: #e5e7eb;
+      color: var(--text);
       cursor: pointer;
+      transition:
+        background-color 0.35s ease,
+        color 0.35s ease,
+        border-color 0.35s ease;
     }
 
     .help-badge:hover {
@@ -433,10 +493,14 @@
       margin-top: 4px;
       padding: 6px 8px;
       border-radius: 8px;
-      border: 1px solid #111827;
-      background: #020617;
+      border: 1px solid var(--border-soft);
+      background: var(--bg-elevated);
       font-size: 0.75rem;
-      color: #9ca3af;
+      color: var(--text-muted);
+      transition:
+        background-color 0.35s ease,
+        border-color 0.35s ease,
+        color 0.35s ease;
     }
 
     .help-panel ul {
@@ -463,26 +527,39 @@
 
     .data-table th,
     .data-table td {
-      border: 1px solid #1f2937;
+      border: 1px solid var(--border);
       padding: 4px 6px;
       text-align: left;
       white-space: nowrap;
+      transition: background-color 0.35s ease, border-color 0.35s ease, color 0.35s ease;
     }
 
     .data-table th {
-      background: #020617;
-      color: #9ca3af;
+      background: var(--bg-card);
+      color: var(--text-muted);
       position: sticky;
       top: 0;
       z-index: 1;
     }
 
     .data-table tbody tr:nth-child(odd) {
-      background: #020617;
+      background: var(--bg-card);
     }
 
     .data-table tbody tr:nth-child(even) {
-      background: #030712;
+      background: var(--bg-elevated);
+    }
+
+    /* Theme toggle button (reuses help-badge) */
+    #themeToggle {
+      margin-left: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    #themeToggle span {
+      font-size: 0.7rem;
     }
   </style>
 </head>
@@ -494,9 +571,14 @@
     </div>
 
     <div class="meta">
-      <span id="appVersion">v0.9.6</span>
+      <span id="appVersion">v0.9.7</span>
       <span>•</span>
       <span id="buildDateText">Build date: 2025-11-23</span>
+
+      <button id="themeToggle" class="help-badge">
+        <span id="themeToggleIcon">🌙</span>
+        <span id="themeToggleText">Dark</span>
+      </button>
     </div>
 
     <div class="grid">
@@ -865,7 +947,7 @@
                   type="number"
                   value="30"
                   step="1"
-                  style="width: 3rem; background:#020617; color:#e5e7eb; border:1px solid #1f2937; border-radius:4px; padding:2px 4px; font-size:0.75rem;"
+                  style="width: 3rem; background: var(--bg-input); color: var(--text); border:1px solid var(--border); border-radius:4px; padding:2px 4px; font-size:0.75rem;"
                   title="Distance in yards for the first FPS/momentum estimate."
                 /> yd)
               </span>
@@ -882,7 +964,7 @@
                   type="number"
                   value="60"
                   step="1"
-                  style="width: 3rem; background:#020617; color:#e5e7eb; border:1px solid #1f2937; border-radius:4px; padding:2px 4px; font-size:0.75rem;"
+                  style="width: 3rem; background: var(--bg-input); color: var(--text); border:1px solid var(--border); border-radius:4px; padding:2px 4px; font-size:0.75rem;"
                   title="Distance in yards for the second FPS/momentum estimate. This also drives the arc range."
                 /> yd)
               </span>
@@ -956,7 +1038,7 @@
                 type="number"
                 value="80"
                 step="5"
-                style="width: 3.5rem; background:#020617; color:#e5e7eb; border:1px solid #1f2937; border-radius:4px; padding:2px 4px; font-size:0.75rem;"
+                style="width: 3.5rem; background: var(--bg-input); color: var(--text); border:1px solid var(--border); border-radius:4px; padding:2px 4px; font-size:0.75rem;"
                 title="Maximum distance (yards) for the displayed arc. Horizontal axis will extend slightly beyond this."
               /> yd (visual only)
             </div>
@@ -1119,7 +1201,6 @@
             </table>
           </div>
         </div>
-
       </div>
     </div>
 
@@ -1168,7 +1249,6 @@
       return (arrowWeightGrains * fps) / 225400;
     }
 
-    // Classify momentum into a rough game band.
     function classifyMomentumBand(momentum) {
       if (!isFinite(momentum) || momentum <= 0) return null;
 
@@ -1232,10 +1312,6 @@
 
       const effectiveRangeYards = Math.max(arcRangeYards, 0);
 
-      // Tighter horizontal scaling at closer ranges so the arc is easier to see.
-      //  - Under 40 yd: ~15% extra room
-      //  - 40–80 yd: ~10% extra room
-      //  - Over 80 yd: +5 yd for a little breathing room
       let axisMaxYards;
       if (effectiveRangeYards < 40) {
         axisMaxYards = effectiveRangeYards * 1.15;
@@ -1246,45 +1322,34 @@
       }
       axisMaxYards = Math.max(axisMaxYards, effectiveRangeYards + 2, 10);
 
-      // Use launch FPS if valid, otherwise assume ~280 fps as a baseline.
       const baseFps = isFinite(launchFps) && launchFps > 0 ? launchFps : 280;
       const speedFactor = 280 / baseFps; // slower arrows = slightly more arc
 
-      // Peak height scaling:
-      //   - For 60 yd and 280 fps, ~4.5 ft (our original reference)
-      //   - Grow roughly with distance^2 and adjust a bit for slower/faster bows
       const refRangeYards = 60;
       const normalized = effectiveRangeYards / refRangeYards;
       let HmaxFeet = 4.5 * normalized * normalized * speedFactor;
-      // Do not exceed the fixed axis max; ensure it's not visually invisible.
       HmaxFeet = Math.max(0.3, Math.min(HmaxFeet, AXIS_MAX_HEIGHT_FEET));
 
       const steps = 30;
       const points = [];
 
       for (let i = 0; i <= steps; i++) {
-        const t = i / steps; // 0..1 along the shot
+        const t = i / steps;
         const dYards = effectiveRangeYards * t;
 
-        // Symmetric parabola: 0 at start & end, Hmax at t=0.5
-        const heightFeet = HmaxFeet * 4 * t * (1 - t); // 4t(1-t) peaks at t=0.5
+        const heightFeet = HmaxFeet * 4 * t * (1 - t);
 
-        // Map to SVG:
-        //  - X: distance 0..axisMaxYards -> 0..100
-        //  - Y: height 0..AXIS_MAX_HEIGHT_FEET -> 50..10
         const x = (dYards / axisMaxYards) * 100;
         let yNorm = heightFeet / AXIS_MAX_HEIGHT_FEET;
         if (yNorm < 0) yNorm = 0;
         if (yNorm > 1) yNorm = 1;
-        const y = 50 - yNorm * 40; // 10..50
+        const y = 50 - yNorm * 40;
 
         points.push(`${x},${y}`);
       }
 
-      // Update arc line
       lineEl.setAttribute("points", points.join(" "));
 
-      // Peak point is at mid-flight (effectiveRangeYards / 2)
       const midYards = effectiveRangeYards / 2;
       const xPeak = (midYards / axisMaxYards) * 100;
       const yPeakNorm = HmaxFeet / AXIS_MAX_HEIGHT_FEET;
@@ -1296,8 +1361,6 @@
       peakLabel.setAttribute("y", (yPeak + 5).toString());
       peakLabel.textContent = HmaxFeet.toFixed(1) + " ft";
 
-      // Approximate launch angle from Hmax and range:
-      // H/R ≈ (1/4)tan(theta) → theta ≈ arctan(4H/R)
       const rangeFeet = effectiveRangeYards * 3;
       let angleDeg = 0;
       if (rangeFeet > 0 && HmaxFeet > 0) {
@@ -1305,11 +1368,10 @@
         angleDeg = angleRad * (180 / Math.PI);
       }
 
-      // Draw a small launch angle line from the left ground point
       const originX = 0;
       const originY = 50;
       const angleSvgRad = angleDeg * (Math.PI / 180);
-      const lineLen = 12; // SVG units
+      const lineLen = 12;
       const x2 = originX + Math.cos(angleSvgRad) * lineLen;
       const y2 = originY - Math.sin(angleSvgRad) * lineLen;
 
@@ -1320,7 +1382,6 @@
       angleLabel.textContent =
         angleDeg > 0 ? "~" + angleDeg.toFixed(1) + "°" : "";
 
-      // Impact momentum text at right (positioned near top-right of the plot)
       if (isFinite(impactMomentum) && impactMomentum > 0) {
         impactLabel.textContent = "~" + impactMomentum.toFixed(3) + " slug·ft/s";
       } else {
@@ -1347,7 +1408,7 @@
     function calculateAndUpdate() {
       // Bow
       const bowDrawWeightLb = readNumber("bowDrawWeightLb");
-      const bowDrawLengthIn = readNumber("bowDrawLengthIn"); // reserved
+      const bowDrawLengthIn = readNumber("bowDrawLengthIn");
       const launchFps = readNumber("launchFps");
       const fpsLossPer10Yards = readNumber("fpsLossPer10Yards");
 
@@ -1356,7 +1417,6 @@
       const dist2Yards = readNumber("dist2Yards");
       const trajMaxDistanceYards = readNumber("trajMaxDistanceYards");
 
-      // Arc range (visual). Use a small fallback if 0.
       let arcRangeYards = trajMaxDistanceYards > 0 ? trajMaxDistanceYards : 10;
 
       // Arrow geometry
@@ -1380,38 +1440,33 @@
       const userNotesEl = document.getElementById("userNotes");
       const userNotesStr = userNotesEl ? userNotesEl.value.trim() : "";
 
-      // Timestamp (when this calculation is rendered)
       const now = new Date();
       const timestampStr = now.toLocaleString();
 
-      // Component weights (grains)
       const shaftWeightGr = bareShaftWeightGr;
       const pointSystemWeightGr = insertWeightGr + pointWeightGr;
       const fletchingSystemWeightGr =
         nockWeightGr +
         wrapWeightGr +
         vaneCount * vaneWeightGr +
-        glueWeightGr; // nock + wrap + vanes + glue
+        glueWeightGr;
 
       const totalArrowWeightGr =
         shaftWeightGr + pointSystemWeightGr + fletchingSystemWeightGr;
 
-      // FOC & shift
       let focPercent = NaN;
       let focShiftIn = NaN;
       if (arrowLengthIn > 0) {
         const centerIn = arrowLengthIn / 2;
-        focShiftIn = balancePointIn - centerIn; // + = forward of center
+        focShiftIn = balancePointIn - centerIn;
         focPercent = (focShiftIn / arrowLengthIn) * 100;
       }
 
-      // Grains per pound
       let grainsPerPound = NaN;
       if (bowDrawWeightLb > 0) {
         grainsPerPound = totalArrowWeightGr / bowDrawWeightLb;
       }
 
-      // GPI
       let shaftGpi = NaN;
       let arrowGpi = NaN;
       if (arrowLengthIn > 0) {
@@ -1419,15 +1474,11 @@
         arrowGpi = totalArrowWeightGr / arrowLengthIn;
       }
 
-      // Read arrow name for the data table
       const arrowNameInput = document.getElementById("arrowName");
       const arrowNameStr = arrowNameInput
         ? (arrowNameInput.value.trim() || "Unnamed arrow")
         : "Unnamed arrow";
 
-      // -----------------------------
-      // Core numeric results
-      // -----------------------------
       const totalEl = document.getElementById("totalArrowWeightGr");
       const focEl = document.getElementById("focPercent");
       const gppEl = document.getElementById("grainsPerPound");
@@ -1462,7 +1513,6 @@
         spineDisplayEl.textContent = arrowSpine > 0 ? arrowSpine.toString() : "–";
       }
 
-      // FOC tag
       const focTag = document.getElementById("focTag");
       if (focTag) {
         focTag.style.display = isFinite(focPercent) ? "inline-block" : "none";
@@ -1483,14 +1533,12 @@
         }
       }
 
-      // GPP tag
       const gppTag = document.getElementById("gppTag");
       if (gppTag) {
         const gpp = grainsPerPound;
         gppTag.style.display = isFinite(gpp) ? "inline-block" : "none";
         if (isFinite(gpp)) {
           gppTag.classList.remove("gpp-low", "gpp-normal", "gpp-high");
-
           let text = "";
           if (gpp < 5.3) {
             gppTag.classList.add("gpp-low");
@@ -1506,7 +1554,6 @@
         }
       }
 
-      // GPI (full arrow) tag
       const gpiTag = document.getElementById("gpiTag");
       if (gpiTag) {
         const gpi = arrowGpi;
@@ -1531,9 +1578,6 @@
         }
       }
 
-      // -----------------------------
-      // Kinetics: FPS & Momentum
-      // -----------------------------
       const launchFpsUsed = launchFps > 0 ? launchFps : NaN;
       const fps1 = estimateFpsAtDistance(
         launchFpsUsed,
@@ -1589,7 +1633,6 @@
         dist2KineticsDisplay.textContent = fpsText + " / " + momText;
       }
 
-      // Game momentum band based on farthest distance (dist1, dist2, arc)
       if (momentumBandLabel) {
         const farthestDist = Math.max(dist1Yards, dist2Yards, arcRangeYards);
         if (!isFinite(farthestDist) || farthestDist <= 0) {
@@ -1620,7 +1663,6 @@
         }
       }
 
-      // Trajectory arc: impact momentum at the arc's max distance
       const fpsImpact = estimateFpsAtDistance(
         launchFpsUsed,
         fpsLossPer10Yards,
@@ -1633,9 +1675,6 @@
 
       updateTrajectoryGraph(launchFpsUsed, arcRangeYards, impactMomentum);
 
-      // -----------------------------
-      // FOC visualization along arrow (Nock -> Point)
-      // -----------------------------
       const balanceMarker = document.getElementById("balanceMarker");
       if (balanceMarker) {
         if (arrowLengthIn > 0 && isFinite(balancePointIn)) {
@@ -1649,19 +1688,16 @@
         }
       }
 
-      // -----------------------------
-      // FOC shift gauge (back vs front)
-      // -----------------------------
       const focShiftMarker = document.getElementById("focShiftMarker");
       const focShiftDetails = document.getElementById("focShiftDetails");
 
       if (focShiftMarker) {
         if (isFinite(focPercent)) {
-          const MAX_RANGE = 20; // +/- 20% range for visualization
-          let ratio = focPercent / MAX_RANGE; // -1 .. +1 typical
+          const MAX_RANGE = 20;
+          let ratio = focPercent / MAX_RANGE;
           if (ratio < -1) ratio = -1;
           if (ratio > 1) ratio = 1;
-          const percent = 50 + ratio * 50; // map -1..1 -> 0..100
+          const percent = 50 + ratio * 50;
           focShiftMarker.style.left = percent + "%";
         } else {
           focShiftMarker.style.left = "50%";
@@ -1695,9 +1731,6 @@
         }
       }
 
-      // -----------------------------
-      // Weight distribution composition
-      // -----------------------------
       const weightShaft = document.getElementById("weightShaft");
       const weightPoint = document.getElementById("weightPoint");
       const weightFletch = document.getElementById("weightFletch");
@@ -1741,34 +1774,26 @@
         }
       }
 
-      // -----------------------------
-      // Data table: inputs & calculated values
-      // -----------------------------
       const tableBody = document.getElementById("summaryTableBody");
       if (tableBody) {
         const rows = [];
 
-        // Meta
         rows.push(["Meta", "Timestamp", "Auto", timestampStr, ""]);
 
-        // Bow
         rows.push(["Bow", "Draw weight", "Input", formatNumber(bowDrawWeightLb, 1), "lb"]);
         rows.push(["Bow", "Draw length", "Input", formatNumber(bowDrawLengthIn, 1), "in"]);
         rows.push(["Bow", "Launch speed estimate", "Input", formatNumber(launchFps, 0), "fps"]);
         rows.push(["Bow", "Speed loss / 10 yd", "Input", formatNumber(fpsLossPer10Yards, 1), "fps/10yd"]);
 
-        // Distances & arc
         rows.push(["Distances", "Distance 1", "Input", formatNumber(dist1Yards, 0), "yd"]);
         rows.push(["Distances", "Distance 2", "Input", formatNumber(dist2Yards, 0), "yd"]);
         rows.push(["Distances", "Arc range (visual)", "Input", formatNumber(arcRangeYards, 0), "yd"]);
 
-        // Arrow info
         rows.push(["Arrow", "Name", "Input", arrowNameStr, ""]);
         rows.push(["Arrow", "Spine", "Input", arrowSpine > 0 ? arrowSpine.toString() : "–", ""]);
         rows.push(["Arrow", "Arrow length", "Input", formatNumber(arrowLengthIn, 2), "in"]);
         rows.push(["Arrow", "Bare shaft weight", "Input", formatNumber(bareShaftWeightGr, 1), "gr"]);
 
-        // Components
         rows.push(["Components", "Nock weight", "Input", formatNumber(nockWeightGr, 1), "gr"]);
         rows.push(["Components", "Wrap weight", "Input", formatNumber(wrapWeightGr, 1), "gr"]);
         rows.push(["Components", "Vane count", "Input", formatNumber(vaneCount, 0), ""]);
@@ -1777,17 +1802,14 @@
         rows.push(["Components", "Point weight", "Input", formatNumber(pointWeightGr, 1), "gr"]);
         rows.push(["Components", "Glue weight (est.)", "Input", formatNumber(glueWeightGr, 1), "gr"]);
 
-        // Balance
         rows.push(["Balance", "Balance point from nock", "Input", formatNumber(balancePointIn, 2), "in"]);
 
-        // Calculated totals & ratios
         rows.push(["Calculated", "Total arrow weight", "Calculated", formatNumber(totalArrowWeightGr, 1), "gr"]);
         rows.push(["Calculated", "FOC", "Calculated", isFinite(focPercent) ? formatNumber(focPercent, 1) : "–", "%"]);
         rows.push(["Calculated", "Grains per pound (GPP)", "Calculated", isFinite(grainsPerPound) ? formatNumber(grainsPerPound, 1) : "–", "gpp"]);
         rows.push(["Calculated", "Shaft GPI (bare)", "Calculated", isFinite(shaftGpi) ? formatNumber(shaftGpi, 2) : "–", "gr/in"]);
         rows.push(["Calculated", "Arrow GPI (full)", "Calculated", isFinite(arrowGpi) ? formatNumber(arrowGpi, 2) : "–", "gr/in"]);
 
-        // Kinetics / momentum
         rows.push(["Kinetics", "Launch speed", "Calculated", isFinite(launchFpsUsed) ? formatNumber(launchFpsUsed, 0) : "–", "fps"]);
         rows.push(["Kinetics", "Launch momentum", "Calculated", isFinite(launchMomentum) ? formatNumber(launchMomentum, 3) : "–", "slug·ft/s"]);
         rows.push(["Kinetics", "Speed @ Dist 1", "Calculated", isFinite(fps1) ? formatNumber(fps1, 0) : "–", "fps"]);
@@ -1795,10 +1817,8 @@
         rows.push(["Kinetics", "Speed @ Dist 2", "Calculated", isFinite(fps2) ? formatNumber(fps2, 0) : "–", "fps"]);
         rows.push(["Kinetics", "Momentum @ Dist 2", "Calculated", isFinite(momentum2) ? formatNumber(momentum2, 3) : "–", "slug·ft/s"]);
 
-        // Notes (last row)
         rows.push(["Notes", "Notes", "Input", userNotesStr || "—", ""]);
 
-        // Fill table body
         let html = "";
         for (const [cat, field, source, value, units] of rows) {
           html += "<tr>" +
@@ -1810,6 +1830,42 @@
             "</tr>";
         }
         tableBody.innerHTML = html;
+      }
+    }
+
+    // -----------------------------
+    // Theme toggle
+    // -----------------------------
+    function updateThemeToggleLabel() {
+      const icon = document.getElementById("themeToggleIcon");
+      const text = document.getElementById("themeToggleText");
+      const isLight = document.body.classList.contains("light-mode");
+
+      if (!icon || !text) return;
+
+      if (isLight) {
+        icon.textContent = "🌞";
+        text.textContent = "Light";
+      } else {
+        icon.textContent = "🌙";
+        text.textContent = "Dark";
+      }
+    }
+
+    function initTheme() {
+      const saved = localStorage.getItem("arrowTuneTheme");
+      if (saved === "light") {
+        document.body.classList.add("light-mode");
+      }
+      updateThemeToggleLabel();
+
+      const btn = document.getElementById("themeToggle");
+      if (btn) {
+        btn.addEventListener("click", () => {
+          const isLight = document.body.classList.toggle("light-mode");
+          localStorage.setItem("arrowTuneTheme", isLight ? "light" : "dark");
+          updateThemeToggleLabel();
+        });
       }
     }
 
@@ -1852,32 +1908,26 @@
       });
     }
 
-    // Notes should also trigger table updates
     const notesEl = document.getElementById("userNotes");
     if (notesEl) {
       notesEl.addEventListener("input", calculateAndUpdate);
     }
 
-    // Distance 2 drives Arc range (one-way)
     const trajInput = document.getElementById("trajMaxDistanceYards");
     const dist2Input = document.getElementById("dist2Yards");
     if (trajInput && dist2Input) {
-      // Initial sync: arc range follows Distance 2's initial value
       trajInput.value = dist2Input.value;
 
-      // When Distance 2 changes, update Arc range (Trajectory Arc) to match
       dist2Input.addEventListener("input", () => {
         trajInput.value = dist2Input.value;
         calculateAndUpdate();
       });
 
-      // When arc range is edited directly, just recalc (do NOT override Distance 2)
       trajInput.addEventListener("input", () => {
         calculateAndUpdate();
       });
     }
 
-    // Help panel toggle for Kinetics / momentum bands
     const bandsHelpToggle = document.getElementById("bandsHelpToggle");
     const bandsHelpPanel = document.getElementById("bandsHelpPanel");
     if (bandsHelpToggle && bandsHelpPanel) {
@@ -1889,7 +1939,6 @@
       });
     }
 
-    // Help panel toggle for Results (FOC/GPP/GPI)
     const resultsHelpToggle = document.getElementById("resultsHelpToggle");
     const resultsHelpPanel = document.getElementById("resultsHelpPanel");
 
@@ -1902,8 +1951,8 @@
       });
     }
 
-    // Initial render
     updateArrowNameDisplay();
+    initTheme();
     calculateAndUpdate();
   </script>
 </body>
