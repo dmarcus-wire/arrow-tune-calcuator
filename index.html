@@ -81,7 +81,7 @@
 
     .card h2 {
       font-size: 1rem;
-      margin: 0 0 8px 0;
+      margin: 0 0 10px 0;
       color: #e5e7eb;
     }
 
@@ -153,8 +153,9 @@
     .foc-normal { background: #064e3b; color: #bbf7d0; }
     .foc-high { background: #7f1d1d; color: #fecaca; }
 
+    /* Arrow balance bar */
     .arrow-visual {
-      margin-top: 8px;
+      margin-top: 4px;
       text-align: center;
     }
 
@@ -214,6 +215,7 @@
       color: #9ca3af;
     }
 
+    /* Weight composition bar */
     .weight-bar {
       margin-top: 8px;
       width: 100%;
@@ -311,13 +313,20 @@
       color: #4b5563;
     }
 
-    /* Small titles for each visualization block */
+    /* Visualization sub-blocks inside the FOC card */
+    .viz-block {
+      margin-top: 8px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #111827;
+      background: #020617;
+    }
+
     .viz-title {
       font-size: 0.8rem;
       font-weight: 600;
       color: #e5e7eb;
-      margin-top: 6px;
-      margin-bottom: 2px;
+      margin-bottom: 4px;
     }
   </style>
 </head>
@@ -618,7 +627,8 @@
           </div>
 
           <div class="note">
-            Momentum is computed as: (arrow grains × fps) / 225,400. Values are approximate and based on your launch FPS and speed loss settings.
+            Momentum is computed as: (arrow grains × fps) / 225,400.
+            Values are approximate and based on your launch FPS and speed loss settings.
           </div>
         </div>
 
@@ -627,7 +637,7 @@
           <h2>FOC & Weight Distribution</h2>
 
           <!-- 1) FOC Shift Gauge -->
-          <div class="foc-shift-visual">
+          <div class="viz-block foc-shift-visual">
             <div class="viz-title">FOC Shift Gauge</div>
             <div class="foc-shift-track">
               <div class="foc-shift-zero"></div>
@@ -643,7 +653,7 @@
           </div>
 
           <!-- 2) Arrow balance along length -->
-          <div class="arrow-visual">
+          <div class="viz-block arrow-visual">
             <div class="viz-title">Arrow Balance (Nock → Point)</div>
             <div class="arrow-ends">
               <span>Nock / back of arrow</span>
@@ -660,7 +670,7 @@
           </div>
 
           <!-- 3) Weight composition bar -->
-          <div class="weight-visual">
+          <div class="viz-block weight-visual">
             <div class="viz-title">Weight Composition</div>
             <div class="weight-bar">
               <div id="weightShaft" class="weight-shaft"></div>
@@ -707,7 +717,7 @@
     // -----------------------------
     // App metadata (easy to update)
     // -----------------------------
-    const APP_VERSION = "v0.5.1";
+    const APP_VERSION = "v0.5.2";
     const BUILD_DATE = "2025-11-23";
 
     // -----------------------------
@@ -877,30 +887,56 @@
       // Kinetics: FPS & Momentum
       // -----------------------------
       const launchFpsUsed = launchFps > 0 ? launchFps : NaN;
-      const fps1 = estimateFpsAtDistance(launchFpsUsed, fpsLossPer10Yards, dist1Yards);
-      const fps2 = estimateFpsAtDistance(launchFpsUsed, fpsLossPer10Yards, dist2Yards);
+      const fps1 = estimateFpsAtDistance(
+        launchFpsUsed,
+        fpsLossPer10Yards,
+        dist1Yards
+      );
+      const fps2 = estimateFpsAtDistance(
+        launchFpsUsed,
+        fpsLossPer10Yards,
+        dist2Yards
+      );
 
-      const launchMomentum = computeMomentumSlugFtPerSec(totalArrowWeightGr, launchFpsUsed);
+      const launchMomentum = computeMomentumSlugFtPerSec(
+        totalArrowWeightGr,
+        launchFpsUsed
+      );
       const momentum1 = computeMomentumSlugFtPerSec(totalArrowWeightGr, fps1);
       const momentum2 = computeMomentumSlugFtPerSec(totalArrowWeightGr, fps2);
 
-      const launchKineticsDisplay = document.getElementById("launchKineticsDisplay");
-      const dist1KineticsDisplay = document.getElementById("dist1KineticsDisplay");
-      const dist2KineticsDisplay = document.getElementById("dist2KineticsDisplay");
+      const launchKineticsDisplay =
+        document.getElementById("launchKineticsDisplay");
+      const dist1KineticsDisplay =
+        document.getElementById("dist1KineticsDisplay");
+      const dist2KineticsDisplay =
+        document.getElementById("dist2KineticsDisplay");
 
       if (launchKineticsDisplay) {
-        const fpsText = isFinite(launchFpsUsed) ? formatNumber(launchFpsUsed, 0) + " fps" : "– fps";
-        const momText = isFinite(launchMomentum) ? formatNumber(launchMomentum, 3) + " slug·ft/s" : "– slug·ft/s";
+        const fpsText = isFinite(launchFpsUsed)
+          ? formatNumber(launchFpsUsed, 0) + " fps"
+          : "– fps";
+        const momText = isFinite(launchMomentum)
+          ? formatNumber(launchMomentum, 3) + " slug·ft/s"
+          : "– slug·ft/s";
         launchKineticsDisplay.textContent = fpsText + " / " + momText;
       }
       if (dist1KineticsDisplay) {
-        const fpsText = isFinite(fps1) ? formatNumber(fps1, 0) + " fps" : "– fps";
-        const momText = isFinite(momentum1) ? formatNumber(momentum1, 3) + " slug·ft/s" : "– slug·ft/s";
+        const fpsText = isFinite(fps1)
+          ? formatNumber(fps1, 0) + " fps"
+          : "– fps";
+        const momText = isFinite(momentum1)
+          ? formatNumber(momentum1, 3) + " slug·ft/s"
+          : "– slug·ft/s";
         dist1KineticsDisplay.textContent = fpsText + " / " + momText;
       }
       if (dist2KineticsDisplay) {
-        const fpsText = isFinite(fps2) ? formatNumber(fps2, 0) + " fps" : "– fps";
-        const momText = isFinite(momentum2) ? formatNumber(momentum2, 3) + " slug·ft/s" : "– slug·ft/s";
+        const fpsText = isFinite(fps2)
+          ? formatNumber(fps2, 0) + " fps"
+          : "– fps";
+        const momText = isFinite(momentum2)
+          ? formatNumber(momentum2, 3) + " slug·ft/s"
+          : "– slug·ft/s";
         dist2KineticsDisplay.textContent = fpsText + " / " + momText;
       }
 
@@ -977,7 +1013,8 @@
         if (totalArrowWeightGr > 0) {
           const shaftPct = (shaftWeightGr / totalArrowWeightGr) * 100;
           const pointPct = (pointSystemWeightGr / totalArrowWeightGr) * 100;
-          const fletchPct = (fletchingSystemWeightGr / totalArrowWeightGr) * 100;
+          const fletchPct =
+            (fletchingSystemWeightGr / totalArrowWeightGr) * 100;
 
           weightShaft.style.width = shaftPct + "%";
           weightPoint.style.width = pointPct + "%";
