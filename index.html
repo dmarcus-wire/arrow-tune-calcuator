@@ -372,7 +372,7 @@
     </div>
 
     <div class="meta">
-      <span id="appVersion">v0.8.1</span>
+      <span id="appVersion">v0.8.2</span>
       <span>•</span>
       <span id="buildDateText">Build date: 2025-11-23</span>
     </div>
@@ -747,9 +747,18 @@
                 text-anchor="start"
                 class="traj-label"
               ></text>
+
+              <!-- Impact momentum label at right -->
+              <text
+                id="trajImpactMomentumLabel"
+                x="98"
+                y="46"
+                text-anchor="end"
+                class="traj-label"
+              ></text>
             </svg>
             <div class="traj-legend" id="trajGraphLegend">
-              Left = bow, right = target. Arc height & angle are approximate.
+              Left = bow, right = target. Arc height, angle & impact momentum are approximate.
             </div>
           </div>
         </div>
@@ -880,23 +889,34 @@
      *  - X axis = distance in yards (0 .. maxDistanceYards)
      *  - Y axis = height in feet (0 .. HmaxFeet)
      * We draw a symmetric parabola peaking at mid-flight.
-     * Also shows an approximate launch angle at the bow side.
+     * Also shows:
+     *  - an approximate launch angle at the bow side
+     *  - impact momentum text at the right
      */
-    function updateTrajectoryGraph(launchFps, maxDistanceYards) {
+    function updateTrajectoryGraph(launchFps, maxDistanceYards, impactMomentum) {
       const lineEl = document.getElementById("trajGraphLine");
       const legendEl = document.getElementById("trajGraphLegend");
       const peakDot = document.getElementById("trajPeakDot");
       const peakLabel = document.getElementById("trajPeakLabel");
       const angleLine = document.getElementById("trajAngleLine");
       const angleLabel = document.getElementById("trajAngleLabel");
+      const impactLabel = document.getElementById("trajImpactMomentumLabel");
 
-      if (!lineEl || !legendEl || !peakDot || !peakLabel || !angleLine || !angleLabel) return;
+      if (
+        !lineEl ||
+        !legendEl ||
+        !peakDot ||
+        !peakLabel ||
+        !angleLine ||
+        !angleLabel ||
+        !impactLabel
+      ) return;
 
       if (!isFinite(maxDistanceYards) || maxDistanceYards <= 0) {
         lineEl.setAttribute("points", "");
         legendEl.textContent =
-          "Left = bow, right = target. Arc height & angle are approximate.";
-        // move peak & angle elements off-canvas
+          "Left = bow, right = target. Arc height, angle & impact momentum are approximate.";
+        // move peak & angle elements off-canvas / clear text
         peakDot.setAttribute("cx", "-10");
         peakDot.setAttribute("cy", "-10");
         peakLabel.setAttribute("x", "-10");
@@ -905,6 +925,7 @@
         angleLine.setAttribute("x2", "-10");
         angleLine.setAttribute("y2", "-10");
         angleLabel.textContent = "";
+        impactLabel.textContent = "";
         return;
       }
 
@@ -979,12 +1000,21 @@
       angleLabel.textContent =
         angleDeg > 0 ? "~" + angleDeg.toFixed(1) + "°" : "";
 
+      // Impact momentum text at right
+      if (isFinite(impactMomentum) && impactMomentum > 0) {
+        impactLabel.textContent = "~" + impactMomentum.toFixed(3) + " slug·ft/s";
+      } else {
+        impactLabel.textContent = "";
+      }
+
       legendEl.textContent =
         "Peak height ≈ " +
         HmaxFeet.toFixed(1) +
         " ft, launch angle ≈ " +
         angleDeg.toFixed(1) +
-        "° (0–" +
+        "°, impact ≈ " +
+        (isFinite(impactMomentum) ? impactMomentum.toFixed(3) + " slug·ft/s" : "–") +
+        " (0–" +
         Math.round(distMaxYards) +
         " yd, visual only).";
     }
@@ -1178,7 +1208,20 @@
         dist2Yards,
         10
       );
-      updateTrajectoryGraph(launchFpsUsed, maxDistanceForArc);
+
+      // Impact momentum at the arc's max distance
+      const impactDistanceYards = maxDistanceForArc;
+      const fpsImpact = estimateFpsAtDistance(
+        launchFpsUsed,
+        fpsLossPer10Yards,
+        impactDistanceYards
+      );
+      const impactMomentum = computeMomentumSlugFtPerSec(
+        totalArrowWeightGr,
+        fpsImpact
+      );
+
+      updateTrajectoryGraph(launchFpsUsed, maxDistanceForArc, impactMomentum);
 
       // -----------------------------
       // FOC visualization along arrow (Nock -> Point)
