@@ -13,7 +13,8 @@
     Description:
       A simple browser-based tool to calculate arrow weight, FOC,
       grains per pound, grains per inch, and basic kinetic data (FPS & momentum),
-      with multiple visualizations focused on arrow balance and weight distribution.
+      with multiple visualizations focused on arrow balance, weight distribution,
+      and FPS drop over distance.
 
     Tech:
       - Single self-contained HTML file (HTML + CSS + JS)
@@ -313,7 +314,7 @@
       color: #4b5563;
     }
 
-    /* Visualization sub-blocks inside the FOC card */
+    /* Visualization sub-blocks inside cards */
     .viz-block {
       margin-top: 8px;
       padding: 8px 10px;
@@ -327,8 +328,34 @@
       font-weight: 600;
       color: #e5e7eb;
       margin-bottom: 4px;
-      text-align: left; /* force left-alignment even inside centered containers */
+      text-align: left;
+    }
 
+    /* FPS graph */
+    .fps-graph {
+      width: 100%;
+      max-width: 420px;
+      height: 120px;
+      display: block;
+      margin: 4px auto 0;
+    }
+
+    .fps-graph-axis {
+      stroke: #1f2937;
+      stroke-width: 0.5;
+    }
+
+    #fpsGraphLine {
+      stroke: #3b82f6;
+      stroke-width: 1.5;
+      fill: none;
+    }
+
+    .fps-graph-legend {
+      margin-top: 4px;
+      font-size: 0.75rem;
+      color: #9ca3af;
+      text-align: center;
     }
   </style>
 </head>
@@ -348,23 +375,41 @@
     <div class="grid">
       <!-- LEFT: INPUTS -->
       <div>
+        <!-- Arrow Info -->
+        <div class="card">
+          <h2>Arrow Info</h2>
+          <div class="field">
+            <label
+              for="arrowName"
+              title="Optional name for this arrow setup, such as brand and model."
+            >
+              Arrow name
+            </label>
+            <input
+              id="arrowName"
+              type="text"
+              placeholder="e.g. Easton Axis 5mm 300 spine"
+            />
+          </div>
+          <div class="field">
+            <label
+              for="arrowSpine"
+              title="Arrow spine rating (stiffness), such as 250, 300, 340, 400."
+            >
+              Arrow spine (rating)
+            </label>
+            <input
+              id="arrowSpine"
+              type="number"
+              step="1"
+              placeholder="e.g. 300"
+            />
+          </div>
+        </div>
 
         <!-- Bow -->
         <div class="card">
           <h2>Bow</h2>
-          <div class="field">
-            <label
-              for="bowModel"
-              title="Bow model and year for reference, since FPS is tied to bow design and performance."
-            >
-              Bow model &amp; year
-            </label>
-            <input
-              id="bowModel"
-              type="text"
-              placeholder="e.g. 2025 Hoyt RX-9"
-            />
-          </div>
           <div class="field-row">
             <div class="field">
               <label
@@ -405,36 +450,17 @@
               <input id="fpsLossPer10Yards" type="number" value="3" step="0.5" />
             </div>
           </div>
-        </div>
-
-        <!-- Arrow Info -->
-        <div class="card">
-          <h2>Arrow Info</h2>
           <div class="field">
             <label
-              for="arrowName"
-              title="Optional name for this arrow setup, such as brand and model."
+              for="bowModel"
+              title="Bow model and year for reference, since FPS is tied to bow design and performance."
             >
-              Arrow name
+              Bow model &amp; year
             </label>
             <input
-              id="arrowName"
+              id="bowModel"
               type="text"
-              placeholder="e.g. Easton Axis 5mm 300 spine"
-            />
-          </div>
-          <div class="field">
-            <label
-              for="arrowSpine"
-              title="Arrow spine rating (stiffness), such as 250, 300, 340, 400."
-            >
-              Arrow spine (rating)
-            </label>
-            <input
-              id="arrowSpine"
-              type="number"
-              step="1"
-              placeholder="e.g. 300"
+              placeholder="e.g. 2025 Hoyt RX-9"
             />
           </div>
         </div>
@@ -646,6 +672,38 @@
             Momentum is computed as: (arrow grains × fps) / 225,400.
             Values are approximate and based on your launch FPS and speed loss settings.
           </div>
+
+          <!-- FPS Drop visualization -->
+          <div class="viz-block">
+            <div class="viz-title">FPS Drop Over Distance</div>
+            <svg
+              id="fpsGraph"
+              viewBox="0 0 100 60"
+              preserveAspectRatio="none"
+              class="fps-graph"
+            >
+              <!-- Axes -->
+              <line
+                x1="0"
+                y1="50"
+                x2="100"
+                y2="50"
+                class="fps-graph-axis"
+              ></line>
+              <line
+                x1="0"
+                y1="10"
+                x2="0"
+                y2="50"
+                class="fps-graph-axis"
+              ></line>
+              <!-- Data line -->
+              <polyline id="fpsGraphLine" points=""></polyline>
+            </svg>
+            <div class="fps-graph-legend" id="fpsGraphRangeLabel">
+              Enter launch FPS and distances to see the drop curve.
+            </div>
+          </div>
         </div>
 
         <!-- FOC & weight visuals -->
@@ -733,7 +791,7 @@
     // -----------------------------
     // App metadata (easy to update)
     // -----------------------------
-    const APP_VERSION = "v0.5.2";
+    const APP_VERSION = "v0.6.0";
     const BUILD_DATE = "2025-11-23";
 
     // -----------------------------
@@ -773,6 +831,54 @@
       if (arrowWeightGrains <= 0 || fps <= 0) return NaN;
       // mass (slugs) = grains / 225,400; momentum = mass * velocity.
       return (arrowWeightGrains * fps) / 225400;
+    }
+
+    /**
+     * Update the FPS drop SVG graph from 0 to maxDistanceYards.
+     */
+    function updateFpsGraph(launchFps, fpsLossPer10Yards, maxDistanceYards) {
+      const lineEl = document.getElementById("fpsGraphLine");
+      const labelEl = document.getElementById("fpsGraphRangeLabel");
+      if (!lineEl || !labelEl) return;
+
+      if (
+        !isFinite(launchFps) ||
+        launchFps <= 0 ||
+        !isFinite(fpsLossPer10Yards) ||
+        maxDistanceYards <= 0
+      ) {
+        lineEl.setAttribute("points", "");
+        labelEl.textContent =
+          "Enter launch FPS, FPS loss, and distances to see the drop curve.";
+        return;
+      }
+
+      const steps = 12; // number of segments
+      const maxDist = Math.max(maxDistanceYards, 10);
+
+      // Compute FPS at max distance to figure min/max for vertical scaling
+      const fpsAtMax = estimateFpsAtDistance(launchFps, fpsLossPer10Yards, maxDist);
+      const minFps = Math.min(launchFps, fpsAtMax);
+      const maxFps = Math.max(launchFps, fpsAtMax);
+      const fpsRange = maxFps - minFps || 1; // avoid divide-by-zero
+
+      const points = [];
+      for (let i = 0; i <= steps; i++) {
+        const d = (maxDist * i) / steps;
+        const fps = estimateFpsAtDistance(launchFps, fpsLossPer10Yards, d);
+
+        const x = (d / maxDist) * 100; // 0..100
+        const norm = (fps - minFps) / fpsRange; // 0..1
+        const y = 50 - norm * 40; // 10..50 area inside viewbox
+
+        points.push(`${x},${y}`);
+      }
+
+      lineEl.setAttribute("points", points.join(" "));
+      labelEl.textContent =
+        "0–" +
+        Math.round(maxDist) +
+        " yd: top ≈ launch FPS, bottom ≈ FPS at farthest distance.";
     }
 
     // -----------------------------
@@ -955,6 +1061,10 @@
           : "– slug·ft/s";
         dist2KineticsDisplay.textContent = fpsText + " / " + momText;
       }
+
+      // FPS graph: use furthest distance OR at least 80 yards to show a useful curve
+      const maxDistanceForGraph = Math.max(dist1Yards, dist2Yards, 80);
+      updateFpsGraph(launchFpsUsed, fpsLossPer10Yards, maxDistanceForGraph);
 
       // -----------------------------
       // FOC visualization along arrow (Nock -> Point)
