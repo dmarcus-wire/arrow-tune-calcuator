@@ -1056,11 +1056,6 @@
             </ul>
 
             <p style="margin:4px 0;">
-              Momentum is computed as: <code>(arrow grains × fps) / 225,400</code>.
-              These are still approximations, but they help compare different builds under similar conditions.
-            </p>
-
-            <p style="margin:4px 0;">
               These bands help compare arrow builds, but
               <strong>tuning and shot placement matter more than the numbers alone.</strong>
             </p>
@@ -1081,101 +1076,112 @@
           </div>
           <div id="kineticsInfo" class="info-panel">
             <p>How hard and how fast the arrow is moving at the bow and downrange, plus a simplified flight arc.</p>
+            <p>Momentum is computed as: <code>(arrow grains × fps) / 225,400</code>. These are still approximations, but they help compare different builds under similar conditions.</p>
           </div>
 
-          <div class="results-row">
-            <span class="label">Launch</span>
-            <span class="value" id="launchKineticsDisplay">– fps / – slug·ft/s</span>
-          </div>
-
-          <div class="results-row">
-            <span class="label">
-              Distance 1
-              <span class="note">
-                (<input
-                  id="dist1Yards"
-                  type="number"
-                  value="30"
-                  step="1"
-                  style="width: 3rem; background: var(--bg-input); color: var(--text); border:1px solid var(--border); border-radius:4px; padding:2px 4px; font-size:0.75rem;"
-                  title="Distance in yards for the first FPS/momentum estimate."
-                /> yd)
-              </span>
-            </span>
-            <span class="value" id="dist1KineticsDisplay">– fps / – slug·ft/s</span>
-          </div>
-
-          <div class="results-row">
-            <span class="label">
-              Distance 2
-              <span class="note">
-                (<input
-                  id="dist2Yards"
-                  type="number"
-                  value="60"
-                  step="1"
-                  style="width: 3rem; background: var(--bg-input); color: var(--text); border:1px solid var(--border); border-radius:4px; padding:2px 4px; font-size:0.75rem;"
-                  title="Distance in yards for the second FPS/momentum estimate. This also drives the arc range."
-                /> yd)
-              </span>
-            </span>
-            <span class="value" id="dist2KineticsDisplay">– fps / – slug·ft/s</span>
-          </div>
-
-          <div class="results-row">
-            <span class="label">Game momentum band (farthest distance)</span>
-            <span class="value">
-              <span id="momentumBandLabel" class="momentum-band-text">–</span>
-            </span>
-          </div>
-
-          <div class="note">
-            <span
-              id="bandsHelpToggle"
-              class="help-badge"
-              title="Click to expand a short explanation of how these bands are commonly used."
-            >
-              Learn more about these bands
-            </span>
-          </div>
-
-          <div
-            id="bandsHelpPanel"
-            class="help-panel"
-            style="display: none;"
-          >
-            <div class="note-strong">
-              These bands are rules of thumb — not guarantees.
-            </div>
-            <p style="margin:4px 0%;">
-              Momentum is computed as: <code>(arrow grains × fps) / 225,400</code>.
-              Values here are approximate and depend on your launch FPS and speed loss settings.
-            </p>
-            <p style="margin:4px 0%;">
-              They come from:
-            </p>
-            <ul>
-              <li>Arrow penetration studies that focus on <strong>momentum</strong> (like Dr. Ed Ashby’s work).</li>
-              <li>Common <strong>kinetic energy charts</strong> published by arrow and broadhead manufacturers.</li>
-            </ul>
-            <p style="margin:4px 0%;">
-              Typical interpretations:
-            </p>
-            <ul>
-              <li><strong>~0.25–0.35 slug·ft/s</strong>: small game, turkey.</li>
-              <li><strong>~0.30–0.45 slug·ft/s</strong>: deer-sized game (whitetail, pronghorn).</li>
-              <li><strong>~0.45–0.60+ slug·ft/s</strong>: larger game like elk or black bear.</li>
-              <li><strong>0.60+ slug·ft/s</strong>: very large or dangerous game.</li>
-            </ul>
-            <p style="margin:4px 0%;">
-              They assume sharp, well-built broadheads and legal setups.
-              <strong>Shot placement, arrow flight, and local regulations matter more than any single number.</strong>
-            </p>
-          </div>
-
-          <!-- Trajectory arc visualization -->
+          <!-- 1) FPS & Momentum -->
           <div class="viz-block">
-            <div class="viz-title">Trajectory Arc (Distance vs Height)</div>
+            <div class="viz-title">1) FPS &amp; Momentum at Distances</div>
+
+            <div class="results-row">
+              <span class="label">Launch</span>
+              <span class="value" id="launchKineticsDisplay">– fps / – slug·ft/s</span>
+            </div>
+
+            <div class="results-row">
+              <span class="label">
+                Distance 1
+                <span class="note">
+                  (<input
+                    id="dist1Yards"
+                    type="number"
+                    value="30"
+                    step="1"
+                    style="width: 3rem; background: var(--bg-input); color: var(--text); border:1px solid var(--border); border-radius:4px; padding:2px 4px; font-size:0.75rem;"
+                    title="Distance in yards for the first FPS/momentum estimate."
+                  /> yd)
+                </span>
+              </span>
+              <span class="value" id="dist1KineticsDisplay">– fps / – slug·ft/s</span>
+            </div>
+
+            <div class="results-row">
+              <span class="label">
+                Distance 2
+                <span class="note">
+                  (<input
+                    id="dist2Yards"
+                    type="number"
+                    value="60"
+                    step="1"
+                    style="width: 3rem; background: var(--bg-input); color: var(--text); border:1px solid var(--border); border-radius:4px; padding:2px 4px; font-size:0.75rem;"
+                    title="Distance in yards for the second FPS/momentum estimate. This also drives the arc range."
+                  /> yd)
+                </span>
+              </span>
+              <span class="value" id="dist2KineticsDisplay">– fps / – slug·ft/s</span>
+            </div>
+          </div>
+
+          <!-- 2) Game momentum band (farthest distance) -->
+          <div class="viz-block">
+            <div class="viz-title">2) Game momentum band (farthest distance)</div>
+
+            <div class="results-row">
+              <span class="label">Band classification</span>
+              <span class="value">
+                <span id="momentumBandLabel" class="momentum-band-text">–</span>
+              </span>
+            </div>
+
+            <div class="note">
+              <span
+                id="bandsHelpToggle"
+                class="help-badge"
+                title="Click to expand a short explanation of how these bands are commonly used."
+              >
+                Learn more about these bands
+              </span>
+            </div>
+
+            <div
+              id="bandsHelpPanel"
+              class="help-panel"
+              style="display: none;"
+            >
+              <div class="note-strong">
+                These bands are rules of thumb — not guarantees.
+              </div>
+              <p style="margin:4px 0%;">
+                Momentum is computed as: <code>(arrow grains × fps) / 225,400</code>.
+                Values here are approximate and depend on your launch FPS and speed loss settings.
+              </p>
+              <p style="margin:4px 0%;">
+                They come from:
+              </p>
+              <ul>
+                <li>Arrow penetration studies that focus on <strong>momentum</strong> (like Dr. Ed Ashby’s work).</li>
+                <li>Common <strong>kinetic energy charts</strong> published by arrow and broadhead manufacturers.</li>
+              </ul>
+              <p style="margin:4px 0%;">
+                Typical interpretations:
+              </p>
+              <ul>
+                <li><strong>~0.25–0.35 slug·ft/s</strong>: small game, turkey.</li>
+                <li><strong>~0.30–0.45 slug·ft/s</strong>: deer-sized game (whitetail, pronghorn).</li>
+                <li><strong>~0.45–0.60+ slug·ft/s</strong>: larger game like elk or black bear.</li>
+                <li><strong>0.60+ slug·ft/s</strong>: very large or dangerous game.</li>
+              </ul>
+              <p style="margin:4px 0%;">
+                They assume sharp, well-built broadheads and legal setups.
+                <strong>Shot placement, arrow flight, and local regulations matter more than any single number.</strong>
+              </p>
+            </div>
+          </div>
+
+          <!-- 3) Trajectory arc visualization -->
+          <div class="viz-block">
+            <div class="viz-title">3) Trajectory Arc (Distance vs Height)</div>
             <div class="note" style="margin-top:0; margin-bottom:4px;">
               Shows a simple arc from bow to target based on your arc range, with a little extra room beyond the target.
             </div>
@@ -1317,13 +1323,33 @@
 
           <!-- 3) Weight composition bar -->
           <div class="viz-block weight-visual">
-            <div class="viz-title">Weight Composition</div>
-            <div class="weight-bar">
-              <div class="weight-mid-line"></div>
-              <div id="weightShaft" class="weight-shaft"></div>
-              <div id="weightPoint" class="weight-point"></div>
-              <div id="weightFletch" class="weight-fletch"></div>
+            <div class="viz-title">
+              Weight Composition
+              <button
+                class="info-btn"
+                data-info-target="weightInfo"
+                title="Show information about this visualization"
+                style="margin-left:6px;"
+              >i</button>
             </div>
+
+            <div id="weightInfo" class="info-panel" style="display:none;">
+              <p>
+                The center vertical line shows the 50% weight point.
+                If the blue shaft segment crosses this line,
+                more than half of your total arrow weight is in the shaft.
+              </p>
+            </div>
+
+            <div style="display:flex; justify-content:center;">
+              <div class="weight-bar">
+                <div class="weight-mid-line"></div>
+                <div id="weightShaft" class="weight-shaft"></div>
+                <div id="weightPoint" class="weight-point"></div>
+                <div id="weightFletch" class="weight-fletch"></div>
+              </div>
+            </div>
+
             <div class="weight-legend">
               <span><span class="dot" style="background:#1d4ed8;"></span> Shaft</span>
               <span><span class="dot" style="background:#ea580c;"></span> Point system</span>
@@ -1333,9 +1359,6 @@
               Shaft: – gr (– %)<br>
               Point system: – gr (– %)<br>
               Nock / wrap / vanes + glue: – gr (– %)
-            </div>
-            <div class="note">
-              Center line shows the halfway mark: if the blue shaft segment crosses it, more than half of total arrow weight is in the shaft.
             </div>
           </div>
         </div>
@@ -2144,14 +2167,14 @@
     }
 
     const resultsHelpToggle = document.getElementById("resultsHelpToggle");
-    const resultsHelpPanel = document.getElementById("resultsHelpPanel");
+    theResultsHelpPanel = document.getElementById("resultsHelpPanel");
 
-    if (resultsHelpToggle && resultsHelpPanel) {
+    if (resultsHelpToggle && theResultsHelpPanel) {
       resultsHelpToggle.addEventListener("click", () => {
         const isHidden =
-          resultsHelpPanel.style.display === "none" ||
-          resultsHelpPanel.style.display === "";
-        resultsHelpPanel.style.display = isHidden ? "block" : "none";
+          theResultsHelpPanel.style.display === "none" ||
+          theResultsHelpPanel.style.display === "";
+        theResultsHelpPanel.style.display = isHidden ? "block" : "none";
       });
     }
 
