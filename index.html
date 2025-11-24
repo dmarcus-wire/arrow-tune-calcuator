@@ -13,8 +13,8 @@
     Description:
       A simple browser-based tool to calculate arrow weight, FOC,
       grains per pound, grains per inch, and basic kinetic data (FPS & momentum),
-      with multiple visualizations focused on arrow balance, weight distribution,
-      and FPS drop over distance.
+      with visualizations focused on arrow balance, weight distribution,
+      and a simple trajectory arc over distance.
 
     Tech:
       - Single self-contained HTML file (HTML + CSS + JS)
@@ -331,31 +331,36 @@
       text-align: left;
     }
 
-    /* FPS graph */
-    .fps-graph {
+    /* Trajectory arc graph */
+    .traj-graph {
       width: 100%;
       max-width: 420px;
-      height: 120px;
+      height: 140px;
       display: block;
       margin: 4px auto 0;
     }
 
-    .fps-graph-axis {
+    .traj-axis {
       stroke: #1f2937;
-      stroke-width: 0.5;
+      stroke-width: 0.6;
     }
 
-    #fpsGraphLine {
+    #trajGraphLine {
       stroke: #3b82f6;
       stroke-width: 1.5;
       fill: none;
     }
 
-    .fps-graph-legend {
+    .traj-legend {
       margin-top: 4px;
       font-size: 0.75rem;
       color: #9ca3af;
       text-align: center;
+    }
+
+    .traj-label {
+      fill: #6b7280;
+      font-size: 4px;
     }
   </style>
 </head>
@@ -625,9 +630,9 @@
           </div>
         </div>
 
-        <!-- Kinetics: FPS & Momentum -->
+        <!-- Kinetics: FPS, Momentum & Trajectory -->
         <div class="card">
-          <h2>Kinetics (FPS & Momentum)</h2>
+          <h2>Kinetics (FPS, Momentum & Trajectory)</h2>
 
           <div class="results-row">
             <span class="label">Launch</span>
@@ -673,35 +678,37 @@
             Values are approximate and based on your launch FPS and speed loss settings.
           </div>
 
-          <!-- FPS Drop visualization -->
+          <!-- Trajectory arc visualization -->
           <div class="viz-block">
-            <div class="viz-title">FPS Drop Over Distance</div>
+            <div class="viz-title">Trajectory Arc (Feet vs Yards)</div>
             <svg
-              id="fpsGraph"
+              id="trajGraph"
               viewBox="0 0 100 60"
               preserveAspectRatio="none"
-              class="fps-graph"
+              class="traj-graph"
             >
-              <!-- Axes -->
-              <line
-                x1="0"
-                y1="50"
-                x2="100"
-                y2="50"
-                class="fps-graph-axis"
-              ></line>
-              <line
-                x1="0"
-                y1="10"
-                x2="0"
-                y2="50"
-                class="fps-graph-axis"
-              ></line>
-              <!-- Data line -->
-              <polyline id="fpsGraphLine" points=""></polyline>
+              <!-- Axes: x = feet, y = yards -->
+              <line x1="0" y1="50" x2="100" y2="50" class="traj-axis"></line>
+              <line x1="0" y1="10" x2="0" y2="50" class="traj-axis"></line>
+
+              <!-- Axis labels -->
+              <text x="50" y="58" text-anchor="middle" class="traj-label">
+                Height (feet)
+              </text>
+              <text
+                x="2"
+                y="12"
+                text-anchor="start"
+                class="traj-label"
+              >
+                Yards
+              </text>
+
+              <!-- Data line (feet vs yards) -->
+              <polyline id="trajGraphLine" points=""></polyline>
             </svg>
-            <div class="fps-graph-legend" id="fpsGraphRangeLabel">
-              Enter launch FPS and distances to see the drop curve.
+            <div class="traj-legend" id="trajGraphLegend">
+              Horizontal axis: height in feet. Vertical axis: distance in yards.
             </div>
           </div>
         </div>
@@ -791,7 +798,7 @@
     // -----------------------------
     // App metadata (easy to update)
     // -----------------------------
-    const APP_VERSION = "v0.6.0";
+    const APP_VERSION = "v0.7.0";
     const BUILD_DATE = "2025-11-23";
 
     // -----------------------------
@@ -834,51 +841,64 @@
     }
 
     /**
-     * Update the FPS drop SVG graph from 0 to maxDistanceYards.
+     * Update the simple trajectory arc:
+     *  - Y axis = distance in yards (0 .. maxDistanceYards)
+     *  - X axis = height in feet (0 .. HmaxFeet)
+     * We draw a scaled parabola that peaks around mid-flight.
      */
-    function updateFpsGraph(launchFps, fpsLossPer10Yards, maxDistanceYards) {
-      const lineEl = document.getElementById("fpsGraphLine");
-      const labelEl = document.getElementById("fpsGraphRangeLabel");
-      if (!lineEl || !labelEl) return;
+    function updateTrajectoryGraph(launchFps, maxDistanceYards) {
+      const lineEl = document.getElementById("trajGraphLine");
+      const legendEl = document.getElementById("trajGraphLegend");
+      if (!lineEl || !legendEl) return;
 
-      if (
-        !isFinite(launchFps) ||
-        launchFps <= 0 ||
-        !isFinite(fpsLossPer10Yards) ||
-        maxDistanceYards <= 0
-      ) {
+      if (!isFinite(maxDistanceYards) || maxDistanceYards <= 0) {
         lineEl.setAttribute("points", "");
-        labelEl.textContent =
-          "Enter launch FPS, FPS loss, and distances to see the drop curve.";
+        legendEl.textContent =
+          "Horizontal axis: height in feet. Vertical axis: distance in yards.";
         return;
       }
 
-      const steps = 12; // number of segments
-      const maxDist = Math.max(maxDistanceYards, 10);
+      const distMaxYards = Math.max(maxDistanceYards, 10);
 
-      // Compute FPS at max distance to figure min/max for vertical scaling
-      const fpsAtMax = estimateFpsAtDistance(launchFps, fpsLossPer10Yards, maxDist);
-      const minFps = Math.min(launchFps, fpsAtMax);
-      const maxFps = Math.max(launchFps, fpsAtMax);
-      const fpsRange = maxFps - minFps || 1; // avoid divide-by-zero
+      // Use launch FPS if valid, otherwise assume ~280 fps as a baseline.
+      const baseFps = isFinite(launchFps) && launchFps > 0 ? launchFps : 280;
+      const speedFactor = 280 / baseFps; // slower arrows get a bit more arc
 
+      // Approximate peak height in feet (very rough, just for visualization):
+      // - About 3 ft at 40 yd for a ~280 fps arrow
+      // - Scale with distance and speed (slower = higher arc)
+      let HmaxFeet = (distMaxYards / 40) * 3 * speedFactor;
+      HmaxFeet = Math.max(0.5, Math.min(HmaxFeet, 12)); // clamp between 0.5 and 12 ft
+
+      const steps = 30;
       const points = [];
-      for (let i = 0; i <= steps; i++) {
-        const d = (maxDist * i) / steps;
-        const fps = estimateFpsAtDistance(launchFps, fpsLossPer10Yards, d);
 
-        const x = (d / maxDist) * 100; // 0..100
-        const norm = (fps - minFps) / fpsRange; // 0..1
-        const y = 50 - norm * 40; // 10..50 area inside viewbox
+      for (let i = 0; i <= steps; i++) {
+        const t = i / steps; // 0..1 along the shot
+        const dYards = distMaxYards * t;
+
+        // Simple symmetric parabola: 0 at start & end, Hmax at mid-flight
+        const heightFeet = HmaxFeet * 4 * t * (1 - t); // 4t(1-t) peaks at t=0.5
+
+        // Map to SVG:
+        //  - X: 0..HmaxFeet -> 0..100
+        //  - Y: 0..distMaxYards -> 50..10 (0 at bottom, max distance toward top)
+        const xNorm = HmaxFeet > 0 ? heightFeet / HmaxFeet : 0;
+        const x = xNorm * 100;
+
+        const yNorm = dYards / distMaxYards; // 0 at bow, 1 at farthest
+        const y = 50 - yNorm * 40; // 10..50
 
         points.push(`${x},${y}`);
       }
 
       lineEl.setAttribute("points", points.join(" "));
-      labelEl.textContent =
-        "0–" +
-        Math.round(maxDist) +
-        " yd: top ≈ launch FPS, bottom ≈ FPS at farthest distance.";
+      legendEl.textContent =
+        "Arc scaled so peak ≈ " +
+        HmaxFeet.toFixed(1) +
+        " ft around mid-flight (0–" +
+        Math.round(distMaxYards) +
+        " yd).";
     }
 
     // -----------------------------
@@ -1062,9 +1082,9 @@
         dist2KineticsDisplay.textContent = fpsText + " / " + momText;
       }
 
-      // FPS graph: use furthest distance OR at least 80 yards to show a useful curve
-      const maxDistanceForGraph = Math.max(dist1Yards, dist2Yards, 80);
-      updateFpsGraph(launchFpsUsed, fpsLossPer10Yards, maxDistanceForGraph);
+      // Trajectory arc: use furthest distance OR at least 80 yards
+      const maxDistanceForArc = Math.max(dist1Yards, dist2Yards, 80);
+      updateTrajectoryGraph(launchFpsUsed, maxDistanceForArc);
 
       // -----------------------------
       // FOC visualization along arrow (Nock -> Point)
