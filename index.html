@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>Arrow Tune Calculator</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- Arrow Tune Calculator v1.0.3 – UI + rules-of-thumb updates -->
+  <!-- Arrow Tune Calculator v1.0.3 – UI + rules-of-thumb updates + feedback panel -->
   <style>
     :root {
       --bg: #020617;
@@ -1200,6 +1200,54 @@
             </table>
           </div>
         </article>
+
+        <!-- Feedback panel -->
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">
+                Feedback
+                <button type="button" class="info-icon" data-info-target="feedback-info">i</button>
+              </div>
+              <div class="panel-subtitle">
+                Help improve this calculator by sharing what works, what’s confusing, and what you’d like next.
+              </div>
+              <div id="feedback-info" class="info-text" hidden>
+                Feedback helps improve this calculator for real-world bowhunting and practice setups.
+                Share what makes sense, what doesn’t, and any numbers or visuals you’d like added.
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field-label">How to send feedback</label>
+            <div class="small">
+              You can either email feedback directly, or open a GitHub issue with your notes.
+            </div>
+          </div>
+
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;">
+            <!-- EMAIL BUTTON -->
+            <button
+              type="button"
+              class="btn btn-primary"
+              onclick="window.location.href='mailto:arrow-tune-calculator@tuta.io?subject=Arrow%20Tune%20Calculator%20Feedback&body=Browser%3A%20%0ADevice%3A%20%0ABuild%20summary%20(FOC%2C%20GPP%2C%20GPI%2C%20momentum)%3A%20%0AWhat%20worked%3A%20%0AWhat%20was%20confusing%3A%20%0AWhat%20you%20wish%20it%20did%3A%20';"
+            >
+              ✉️ Email feedback
+            </button>
+
+            <!-- GITHUB ISSUE -->
+            <a
+              class="btn"
+              style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;"
+              href="https://github.com/dmarcus-wire/arrow-tune-calculator/issues/new?title=Feedback%3A+Arrow+Tune+Calculator&body=Browser%3A+%0ADevice%3A+%0ABuild+details+(draw+weight%2C+GPP%2C+FOC)%3A+%0AFeedback%3A+"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              🐛 Open GitHub issue
+            </a>
+          </div>
+        </article>
       </section>
     </main>
   </div>
@@ -1422,7 +1470,6 @@
       return { gpi, band, bandClass };
     }
 
-    // Launch FPS: incorporate rules-of-thumb
     function estimateLaunchFPS(totalWeight) {
       const dw = state.inputs.drawWeight || 0;
       const dl = state.inputs.drawLength || 0;
@@ -1433,16 +1480,15 @@
       const baseDl = 28;
       const baseFps = 280;
 
-      const dwDelta = (dw - baseDw) * 2;   // ~20 fps per 10 lb
-      const dlDelta = (dl - baseDl) * 10;  // ~10 fps per inch
-      const wtDelta = - (totalWeight - baseWt) / 5; // +5 gr ≈ -1 fps
+      const dwDelta = (dw - baseDw) * 2;
+      const dlDelta = (dl - baseDl) * 10;
+      const wtDelta = - (totalWeight - baseWt) / 5;
 
       let fps = baseFps + dwDelta + dlDelta + wtDelta;
       fps = Math.max(140, Math.min(340, fps));
       return fps;
     }
 
-    // Distance FPS: flat fps loss per 10 yd (editable, but we can suggest defaults)
     function fpsAtDistance(launchFps, distanceYards) {
       const lossPer10 = state.inputs.speedLossPer10 || 0;
       if (launchFps <= 0) return 0;
@@ -1671,7 +1717,6 @@
       path.setAttribute('stroke-width', '2');
       svg.appendChild(path);
 
-      // Label at peak of arc
       const peakLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       peakLabel.setAttribute('x', peakX);
       peakLabel.setAttribute('y', peakY - 4);
@@ -1710,9 +1755,9 @@
       let suggested = 5;
 
       if (gpp > 8 || launchFpsUsed < 250) {
-        suggested = 4; // heavier / slower arrow: loses a bit less per 10 yd
+        suggested = 4;
       } else if (gpp < 6 && launchFpsUsed > 280) {
-        suggested = 6; // lighter / faster arrow: loses a bit more per 10 yd
+        suggested = 6;
       }
 
       setValue('speedLossPer10', suggested.toFixed(1).replace(/\.0$/, ''));
@@ -1977,7 +2022,6 @@
         $('showComponents').checked = showComp;
         $('componentsSection').style.display = showComp ? 'block' : 'none';
 
-        // Since CSV provided speed loss, treat it as manually set
         speedLossManual = true;
 
         readInputs();
@@ -1998,7 +2042,6 @@
         ? state.inputs.launchFpsManual
         : launchFpsAuto;
 
-      // Suggest speed loss per 10 yd if user hasn't manually set it
       maybeSuggestSpeedLoss(launchFpsUsed, gppInfo.gpp);
 
       const fpsD1 = fpsAtDistance(launchFpsUsed, state.inputs.distance1 || 0);
