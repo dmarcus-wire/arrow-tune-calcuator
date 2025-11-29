@@ -669,7 +669,7 @@
         <div class="chip-row">
           <div class="chip">Live FOC, GPP, GPI &amp; momentum</div>
           <div class="chip">🏹 Works offline in your browser</div>
-          <span class="version-pill">v1.0.3 · 2025-11-25</span>
+          <span class="version-pill">v1.0.4 · 2025-11-29</span>
         </div>
       </div>
       <div class="toolbar">
@@ -1165,6 +1165,68 @@
           </div>
         </article>
 
+        <!-- 4) Velocity Drop-Off and Time-of-Flight -->
+        <div class="visual-section">
+          <div class="visual-header">
+            <div class="visual-title">
+              4) Velocity Drop-Off &amp; Time-of-Flight
+              <button type="button" class="info-icon" data-info-target="velocity-info">i</button>
+            </div>
+          </div>
+
+          <div id="velocity-info" class="info-text" hidden>
+            Estimates how your arrow slows down over distance and how long it takes to reach the target.
+            Uses your current launch FPS and speed-loss settings, and plots a velocity curve from 0 to your farthest distance.
+          </div>
+
+          <div class="field-grid">
+            <div class="field">
+              <label class="field-label" for="velocityDistance">
+                Distance to target (yd)
+                <span class="aux">(live slider for pin-gap feel)</span>
+              </label>
+              <input
+                id="velocityDistance"
+                type="range"
+                min="0"
+                max="100"
+                step="1"
+                value="40"
+                oninput="document.getElementById('velocityDistanceLabel').textContent = this.value + ' yd';"
+              >
+              <div class="small" style="margin-top:2px;">
+                Selected distance: <strong><span id="velocityDistanceLabel">40 yd</span></strong>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="velocityAtDistance">
+                Velocity at distance (fps)
+                <span class="aux">(based on current drop model)</span>
+              </label>
+              <input id="velocityAtDistance" type="text" readonly>
+
+              <label class="field-label" for="timeOfFlight" style="margin-top:6px;">
+                Time-of-flight (s)
+                <span class="aux">Distance / average velocity</span>
+              </label>
+              <input id="timeOfFlight" type="text" readonly>
+            </div>
+          </div>
+
+          <svg
+            id="velocitySvg"
+            class="trajectory-svg"
+            viewBox="0 0 320 160"
+            preserveAspectRatio="xMidYMid meet"
+            style="margin-top:6px;"
+          ></svg>
+
+          <div class="trajectory-meta" id="velocitySummary">
+            Velocity curve from 0–60 yd based on your launch FPS and speed-loss settings.
+          </div>
+        </div>
+
         <!-- Results + data table (notes moved left) -->
         <article class="panel">
           <div class="panel-header">
@@ -1400,6 +1462,7 @@
         distance1: getNum('distance1'),
         distance2: getNum('distance2'),
         arcRange: getNum('arcRange'),
+        velocityDistance: getNum('velocityDistance'),
         notes: getStr('notes')
       };
     }
@@ -1687,6 +1750,116 @@
         const norm = Math.max(0, Math.min(yMaxFeet, ft));
         return padTop + h - (norm / yMaxFeet) * h;
       }
+    
+    function updateVelocityDropoff(launchFpsUsed) {
+      const svg = $('velocitySvg');
+      if (!svg) return;
+
+      const dSelected = state.inputs.velocityDistance || state.inputs.distance2 || 40;
+
+      // Reuse your existing linear drop model via fpsAtDistance()
+      const vHere = fpsAtDistance(launchFpsUsed, dSelected);
+      const avgV = (launchFpsUsed + vHere) / 2 || 1;
+      const timeSec = (dSelected * 3) / avgV; // yards → feet, then / fps
+
+      setValue('velocityAtDistance', vHere > 0 ? vHere.toFixed(1) : '');
+      setValue('timeOfFlight', vHere > 0 ? timeSec.toFixed(2) : '');
+
+      // Draw velocity curve
+      while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+      const farDist = Math.max(
+        state.inputs.distance2 || 60,
+        state.inputs.arcRange || 60,
+        100
+      );
+      const viewWidth = 320;
+      const viewHeight = 160;
+      const padLeft = 30, padRight = 18, padTop = 20, padBottom = 30;
+      const w = viewWidth - padLeft - padRight;
+      const h = viewHeight - padTop - padBottom;
+
+      function xScale(yd) { return padLeft + (yd / farDist) * w; }
+
+      // Y axis from 0 to launch FPS
+      const maxV = Math.max(launchFpsUsed, vHere) || 300;
+      function yScale(v) {
+        const clamped = Math.max(0, Math.min(maxV, v));
+        return padTop + h - (clamped / maxV) * h;
+      }
+
+      // Axes
+      const xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      xAxis.setAttribute('x1', padLeft);
+      xAxis.setAttribute('y1', padTop + h);
+      xAxis.setAttribute('x2', padLeft + w);
+      xAxis.setAttribute('y2', padTop + h);
+      xAxis.setAttribute('stroke', 'rgba(148,163,184,0.9)');
+      xAxis.setAttribute('stroke-width', '1');
+      svg.appendChild(xAxis);
+
+      const yAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      yAxis.setAttribute('x1', padLeft);
+      yAxis.setAttribute('y1', padTop);
+      yAxis.setAttribute('x2', padLeft);
+      yAxis.setAttribute('y2', padTop + h);
+      yAxis.setAttribute('stroke', 'rgba(148,163,184,0.8)');
+      yAxis.setAttribute('stroke-width', '1');
+      svg.appendChild(yAxis);
+
+      const xLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      xLabel.setAttribute('x', padLeft + w / 2);
+      xLabel.setAttribute('y', padTop + h + 20);
+      xLabel.setAttribute('text-anchor', 'middle');
+      xLabel.setAttribute('font-size', '9');
+      xLabel.setAttribute('fill', 'rgba(148,163,184,0.9)');
+      xLabel.textContent = 'Distance (yd)';
+      svg.appendChild(xLabel);
+
+      const yLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      yLabel.setAttribute('x', padLeft - 24);
+      yLabel.setAttribute('y', padTop + h / 2);
+      yLabel.setAttribute('text-anchor', 'middle');
+      yLabel.setAttribute('font-size', '9');
+      yLabel.setAttribute('fill', 'rgba(148,163,184,0.9)');
+      yLabel.setAttribute('transform', `rotate(-90 ${padLeft-24} ${padTop + h/2})`);
+      yLabel.textContent = 'Velocity (fps)';
+      svg.appendChild(yLabel);
+
+      // Velocity curve from 0 → farDist using your fpsAtDistance()
+      const steps = 40;
+      let d = '';
+      for (let i = 0; i <= steps; i++) {
+        const yd = (farDist * i) / steps;
+        const v = fpsAtDistance(launchFpsUsed, yd);
+        const X = xScale(yd);
+        const Y = yScale(v);
+        d += (i === 0 ? 'M' : 'L') + X + ' ' + Y + ' ';
+      }
+
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', d.trim());
+      path.setAttribute('fill', 'none');
+      path.setAttribute('stroke', '#22c55e');
+      path.setAttribute('stroke-width', '2');
+      svg.appendChild(path);
+
+      // Marker at selected distance
+      const markerX = xScale(dSelected);
+      const markerV = fpsAtDistance(launchFpsUsed, dSelected);
+      const markerY = yScale(markerV);
+      const marker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      marker.setAttribute('cx', markerX);
+      marker.setAttribute('cy', markerY);
+      marker.setAttribute('r', '3');
+      marker.setAttribute('fill', '#f97316');
+      svg.appendChild(marker);
+
+      const summary = `Velocity drops from ~${launchFpsUsed.toFixed(0)} fps at the bow `
+        + `to ~${markerV.toFixed(0)} fps at ${dSelected.toFixed(0)} yd `
+        + `(time-of-flight ≈ ${timeSec.toFixed(2)} s).`;
+      setText('velocitySummary', summary);
+    }
 
       const xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
       xAxis.setAttribute('x1', padLeft);
@@ -2130,6 +2303,7 @@
       updateFOCAndBalance(focInfo);
       updateWeightComposition(totalWeight, totalInfo.componentsUsed);
       drawTrajectory(totalWeight, launchFpsUsed, momentumFarthest);
+      updateVelocityDropoff(launchFpsUsed);
       updateDataTable(totalWeight, focInfo, gppInfo, gpiInfo, launchFpsUsed, fpsD1, fpsD2, momentumFarthest, momentumBandObj);
     }
 
