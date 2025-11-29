@@ -737,6 +737,13 @@
               <label class="field-label" for="letOffPct">Let-off (%)</label>
               <input id="letOffPct" type="number" min="0" max="100" step="1" placeholder="80">
             </div>
+            <!-- MOVED: Launch FPS → Bow as IBO Rating -->
+            <div class="field">
+              <label class="field-label" for="launchFps">IBO Rating (FPS)
+                <span class="aux">(manufacturer spec or chrono)</span>
+              </label>
+              <input id="launchFps" type="number" min="120" max="370" step="1" placeholder="factory IBO or chrono">
+            </div>
           </div>
         </article>
 
@@ -878,106 +885,137 @@
           </div>
         </article>
 
-        <!-- Results & notes (moved LEFT) -->
+        <!-- Build notes & saved setups (moved from right) -->
         <article class="panel">
           <div class="panel-header">
             <div>
               <div class="panel-title">
-                Results &amp; notes
-                <button type="button" class="info-icon" data-info-target="results-info">i</button>
+                Build notes &amp; saved setups
               </div>
               <div class="panel-subtitle">
-                Summary of your build with bands for FOC, GPP, GPI, and momentum.
-              </div>
-              <div id="results-info" class="info-text" hidden>
-                FOC, GPP and GPI bands use common bowhunting guidelines. They are not hard rules, but useful zones to
-                compare different setups.
+                Describe what this build is for and manage saved setups.
               </div>
             </div>
           </div>
 
-          <div class="results-grid">
-            <div class="result-pill">
-              <div class="result-label">Total arrow weight (used for calcs)</div>
-              <div class="result-value"><span id="totalWeightOut">0.0</span> gr</div>
-              <div class="small">
-                Uses component sum when advanced breakdown is fully filled; otherwise uses Total arrow weight field.
-              </div>
-            </div>
-            <div class="result-pill">
-              <div class="result-label">Grains per pound (GPP)</div>
-              <div class="result-value"><span id="gppValue">0.0</span> GPP</div>
-              <div id="gppTag" class="chip-tag">
-                GPP band: <strong><span id="gppBandLabel">(no data)</span></strong>
-              </div>
-            </div>
-            <div class="result-pill">
-              <div class="result-label">Arrow GPI (full arrow)</div>
-              <div class="result-value"><span id="gpiFullValue">0.0</span> GPI</div>
-              <div id="gpiTag" class="chip-tag">
-                GPI band: <strong><span id="gpiBandLabel">(no data)</span></strong>
-              </div>
-            </div>
-            <div class="result-pill">
-              <div class="result-label">Momentum at farthest distance</div>
-              <div class="result-value"><span id="momentumValue">0.000</span> slug·ft/s</div>
-              <div class="small">
-                Your setup: <span id="momentumBandShort">0.000 slug·ft/s → (no band)</span>
-              </div>
-            </div>
+          <div class="field">
+            <label class="field-label" for="notes">
+              Notes
+              <span class="aux">(what this build is for – e.g. elk 0–60 yd, TAC, practice)</span>
+            </label>
+            <textarea id="notes" placeholder="Hunting elk out to ~60 yd. Quiet, forgiving build."></textarea>
           </div>
 
-          <div style="margin-top:8px;">
-            <div class="field">
-              <label class="field-label" for="notes">
-                Notes
-                <span class="aux">(what this build is for – e.g. elk 0–60 yd, TAC, practice)</span>
-              </label>
-              <textarea id="notes" placeholder="Hunting elk out to ~60 yd. Quiet, forgiving build."></textarea>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px;">
+            <div class="field" style="flex:1;">
+              <label class="field-label" for="savedBuildName">Saved build name (auto-suggested)</label>
+              <input id="savedBuildName" type="text" placeholder="2025-11 Hoyt RX-9 Easton 5.0 500 gr 70 lb draw">
             </div>
-
-            <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px;">
-              <div class="field" style="flex:1;">
-                <label class="field-label" for="savedBuildName">Saved build name (auto-suggested)</label>
-                <input id="savedBuildName" type="text" placeholder="2025-11 Hoyt RX-9 Easton 5.0 500 gr 70 lb draw">
-              </div>
-              <button id="refreshNameBtn" type="button" class="btn">🔁 Refresh name</button>
-            </div>
-
-            <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px;" class="small">
-              <span>Saved builds:</span>
-              <select id="savedBuildsSelect" style="max-width:260px;">
-                <option value="">(none yet)</option>
-              </select>
-              <button id="loadBuildBtn" type="button" class="btn">📂 Load selected</button>
-              <!-- NEW inline Save build button -->
-              <button id="saveBuildInlineBtn" type="button" class="btn">💾 Save build</button>
-            </div>
-
-            <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px;" class="small">
-              <span>Upload inputs CSV:</span>
-              <input id="csvUpload" type="file" accept=".csv" style="max-width:230px;">
-              <span>(uses first data row, exported from this tool)</span>
-            </div>
+            <button id="refreshNameBtn" type="button" class="btn">🔁 Suggest name</button>
           </div>
 
-          <div class="data-table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Field</th>
-                  <th>Value</th>
-                  <th>Type</th>
-                </tr>
-              </thead>
-              <tbody id="dataTableBody"></tbody>
-            </table>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px;" class="small">
+            <span>Saved builds:</span>
+            <select id="savedBuildsSelect" style="max-width:260px;">
+              <option value="">(none yet)</option>
+            </select>
+            <button id="saveBuildInlineBtn" type="button" class="btn">💾 Save build</button>
+            <button id="loadBuildBtn" type="button" class="btn">📂 Load selected</button>
+          </div>
+
+          <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px;" class="small">
+            <span>Upload inputs CSV:</span>
+            <input id="csvUpload" type="file" accept=".csv" style="max-width:230px;">
+            <span>(uses first data row, exported from this tool)</span>
           </div>
         </article>
       </section>
 
       <!-- RIGHT COLUMN -->
       <section class="col">
+        <!-- FOC & weight distribution (moved here, above kinetics) -->
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">FOC &amp; weight distribution</div>
+              <div class="panel-subtitle">
+                Visualize front-of-center, balance point, and how your arrow’s weight is distributed.
+              </div>
+            </div>
+          </div>
+
+          <div class="visual-section">
+            <div class="visual-header">
+              <div class="visual-title">
+                Arrow Balance (Nock → Point)
+                <button type="button" class="info-icon" data-info-target="balance-info">i</button>
+              </div>
+            </div>
+            <div id="balance-info" class="info-text" hidden>
+              Center line = geometric center, orange marker = balance point (driven by FOC).
+            </div>
+            <div class="balance-bar">
+              <div class="balance-mid"></div>
+              <div id="balanceMarker" class="balance-marker" style="left:50%;"></div>
+            </div>
+            <div class="balance-labels">
+              <span>Nock end</span><span>Point end</span>
+            </div>
+            <div class="chip-tag" id="balanceSummaryTag">
+              Balance point: <strong><span id="balancePointOut">0.0</span>"</strong> from nock
+            </div>
+          </div>
+
+          <div class="visual-section" style="margin-top:8px;">
+            <div class="visual-header">
+              <div class="visual-title">
+                FOC Shift Gauge
+                <button type="button" class="info-icon" data-info-target="foc-gauge-info">i</button>
+              </div>
+            </div>
+            <div id="foc-gauge-info" class="info-text" hidden>
+              Shaded zone ≈ common bowhunting FOC range (~10–18% forward of center).
+            </div>
+            <div class="gauge-bar">
+              <div class="gauge-range"></div>
+              <div id="focMarker" class="gauge-marker" style="left:50%;"></div>
+            </div>
+            <div class="gauge-axis-labels">
+              <span>-10%</span><span>+30%</span>
+            </div>
+            <div id="focTag" class="chip-tag">
+              FOC: <strong><span id="focValue">0.0</span>%</strong>
+              <span id="focBandLabel">(no data)</span>
+            </div>
+          </div>
+
+          <div class="visual-section" style="margin-top:8px;">
+            <div class="visual-header">
+              <div class="visual-title">
+                Weight Composition
+                <button type="button" class="info-icon" data-info-target="weight-comp-info">i</button>
+              </div>
+            </div>
+            <div id="weight-comp-info" class="info-text" hidden>
+              Center line shows the halfway mark: if the blue shaft segment crosses it, more than half of total arrow
+              weight is in the shaft.
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;">
+              <div class="weight-bar">
+                <div id="shaftSegment" class="weight-segment shaft" style="width:40%;"></div>
+                <div id="pointSegment" class="weight-segment point" style="width:40%;"></div>
+                <div id="tailSegment" class="weight-segment tail" style="width:20%;"></div>
+                <div class="weight-midline"></div>
+              </div>
+              <div id="weightLegend" class="weight-legend">
+                Shaft: 0.0 gr (0.0%)
+                · Point system: 0.0 gr (0.0%)
+                · Nock / wrap / vanes + glue: 0.0 gr (0.0%)
+              </div>
+            </div>
+          </div>
+        </article>
+
         <!-- Kinetics -->
         <article class="panel">
           <div class="panel-header">
@@ -992,7 +1030,7 @@
               <div id="kinetics-info" class="info-text" hidden>
                 Launch FPS is estimated from common archery rules-of-thumb:
                 ~15–20 fps per 10 lb of draw weight, ~10 fps per inch of draw length,
-                and ~1–1.5 fps lost for every +5 grains of arrow weight.
+                and ~1–1.5 fps lost for every +5 grains of arrow weight. You can override with your bow's IBO rating.
               </div>
             </div>
           </div>
@@ -1003,12 +1041,7 @@
               <div class="visual-title">1) FPS estimate</div>
             </div>
             <div class="field-grid">
-              <div class="field">
-                <label class="field-label" for="launchFps">Launch FPS (estimated)
-                  <span class="aux">from draw weight, draw length &amp; arrow weight</span>
-                </label>
-                <input id="launchFps" type="number" min="120" max="350" step="1" placeholder="auto or manual">
-              </div>
+              <!-- Launch FPS field removed from here; now in Bow as IBO Rating -->
               <div class="field">
                 <label class="field-label" for="speedLossPer10">Speed loss per 10 yd (fps)
                   <span class="aux">heavier arrows usually lose fewer fps; suggested, but editable</span>
@@ -1132,86 +1165,66 @@
           </div>
         </article>
 
-        <!-- FOC & weight distribution (moved RIGHT) -->
+        <!-- Results + data table (notes moved left) -->
         <article class="panel">
           <div class="panel-header">
             <div>
-              <div class="panel-title">FOC &amp; weight distribution</div>
+              <div class="panel-title">
+                Results summary
+                <button type="button" class="info-icon" data-info-target="results-info">i</button>
+              </div>
               <div class="panel-subtitle">
-                Visualize front-of-center, balance point, and how your arrow’s weight is distributed.
+                Summary of your build with bands for FOC, GPP, GPI, and momentum.
+              </div>
+              <div id="results-info" class="info-text" hidden>
+                FOC, GPP and GPI bands use common bowhunting guidelines. They are not hard rules, but useful zones to
+                compare different setups.
               </div>
             </div>
           </div>
 
-          <div class="visual-section">
-            <div class="visual-header">
-              <div class="visual-title">
-                Arrow Balance (Nock → Point)
-                <button type="button" class="info-icon" data-info-target="balance-info">i</button>
+          <div class="results-grid">
+            <div class="result-pill">
+              <div class="result-label">Total arrow weight (used for calcs)</div>
+              <div class="result-value"><span id="totalWeightOut">0.0</span> gr</div>
+              <div class="small">
+                Uses component sum when advanced breakdown is fully filled; otherwise uses Total arrow weight field.
               </div>
             </div>
-            <div id="balance-info" class="info-text" hidden>
-              Center line = geometric center, orange marker = balance point (driven by FOC).
+            <div class="result-pill">
+              <div class="result-label">Grains per pound (GPP)</div>
+              <div class="result-value"><span id="gppValue">0.0</span> GPP</div>
+              <div id="gppTag" class="chip-tag">
+                GPP band: <strong><span id="gppBandLabel">(no data)</span></strong>
+              </div>
             </div>
-            <div class="balance-bar">
-              <div class="balance-mid"></div>
-              <div id="balanceMarker" class="balance-marker" style="left:50%;"></div>
+            <div class="result-pill">
+              <div class="result-label">Arrow GPI (full arrow)</div>
+              <div class="result-value"><span id="gpiFullValue">0.0</span> GPI</div>
+              <div id="gpiTag" class="chip-tag">
+                GPI band: <strong><span id="gpiBandLabel">(no data)</span></strong>
+              </div>
             </div>
-            <div class="balance-labels">
-              <span>Nock end</span><span>Point end</span>
-            </div>
-            <div class="chip-tag" id="balanceSummaryTag">
-              Balance point: <strong><span id="balancePointOut">0.0</span>"</strong> from nock
+            <div class="result-pill">
+              <div class="result-label">Momentum at farthest distance</div>
+              <div class="result-value"><span id="momentumValue">0.000</span> slug·ft/s</div>
+              <div class="small">
+                Your setup: <span id="momentumBandShort">0.000 slug·ft/s → (no band)</span>
+              </div>
             </div>
           </div>
 
-          <div class="visual-section" style="margin-top:8px;">
-            <div class="visual-header">
-              <div class="visual-title">
-                FOC Shift Gauge
-                <button type="button" class="info-icon" data-info-target="foc-gauge-info">i</button>
-              </div>
-            </div>
-            <div id="foc-gauge-info" class="info-text" hidden>
-              Shaded zone ≈ common bowhunting FOC range (~10–18% forward of center).
-            </div>
-            <div class="gauge-bar">
-              <div class="gauge-range"></div>
-              <div id="focMarker" class="gauge-marker" style="left:50%;"></div>
-            </div>
-            <div class="gauge-axis-labels">
-              <span>-10%</span><span>+30%</span>
-            </div>
-            <div id="focTag" class="chip-tag">
-              FOC: <strong><span id="focValue">0.0</span>%</strong>
-              <span id="focBandLabel">(no data)</span>
-            </div>
-          </div>
-
-          <div class="visual-section" style="margin-top:8px;">
-            <div class="visual-header">
-              <div class="visual-title">
-                Weight Composition
-                <button type="button" class="info-icon" data-info-target="weight-comp-info">i</button>
-              </div>
-            </div>
-            <div id="weight-comp-info" class="info-text" hidden>
-              Center line shows the halfway mark: if the blue shaft segment crosses it, more than half of total arrow
-              weight is in the shaft.
-            </div>
-            <div style="display:flex;flex-direction:column;align-items:center;">
-              <div class="weight-bar">
-                <div id="shaftSegment" class="weight-segment shaft" style="width:40%;"></div>
-                <div id="pointSegment" class="weight-segment point" style="width:40%;"></div>
-                <div id="tailSegment" class="weight-segment tail" style="width:20%;"></div>
-                <div class="weight-midline"></div>
-              </div>
-              <div id="weightLegend" class="weight-legend">
-                Shaft: 0.0 gr (0.0%)
-                · Point system: 0.0 gr (0.0%)
-                · Nock / wrap / vanes + glue: 0.0 gr (0.0%)
-              </div>
-            </div>
+          <div class="data-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Field</th>
+                  <th>Value</th>
+                  <th>Type</th>
+                </tr>
+              </thead>
+              <tbody id="dataTableBody"></tbody>
+            </table>
           </div>
         </article>
 
@@ -2178,7 +2191,6 @@
         });
       }
 
-      // NEW inline Save build button wiring
       const saveInlineBtn = $('saveBuildInlineBtn');
       if (saveInlineBtn) {
         saveInlineBtn.addEventListener('click', () => {
